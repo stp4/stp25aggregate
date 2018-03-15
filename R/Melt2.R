@@ -4,14 +4,12 @@
 #' Erweiterungen der reshape2::melt Funktion. Intern wird \code{melt} und \code{dcast} verwendet.
 #' @name Melt2
 #' @rdname Melt2
-#' @param x Formel ofer data.frame
-#' @param ... eritere Argumente
+#' @param x Objekt kann Formel oder data.frame sein
+#' @param ... weitere Argumente
 #' @seealso \link[reshape2]{melt} und \link[reshape2]{dcast}
 #'
 #' @return Dataframe in Langform
 #' @export
-#'
-#' @examples
 Melt2 <- function(x, ...) {
   UseMethod("Melt2")
 }
@@ -26,9 +24,9 @@ Melt2 <- function(x, ...) {
 #' @param key Bezeichnung der Bezeichner-Variable default ist "variable"
 #' @param value Bezeichnung der Werte-Variable default ist "value"
 #' @param subset nicht verwendbar
-#' @param na.action auch nicht zu verändern
+#' @param na.action auch nicht zu veraendern
 #' @param X Formula-Objekt nicht ändern
-#' @param id.vars  nur bei Methode data.frame zu verwenden sonst ist hier nichts zu verändern
+#' @param id.vars  nur bei Methode data.frame zu verwenden sonst ist hier nichts zu veraendern
 #' @param ... weitere Argumente an melt
 #' @examples
 #' x<-Melt2(chol0+chol1+chol6+chol12~g , hyper)
@@ -121,7 +119,7 @@ melt2 <-
     if (length(meAsNum) != 0)
       measure[meAsNum] <- names(x[as.numeric(measure[meAsNum])])
 
-    if (is_formula(by))
+    if (stpvers::is_formula2(by))
       by <- all.vars(by)
 
     res <- reshape2::melt (
