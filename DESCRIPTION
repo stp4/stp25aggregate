@@ -2,8 +2,8 @@ Package: stp25aggregate
 Type: Package
 Encoding: UTF-8
 Title: Reports und Auswertungen
-Version: 0.1.2
-Date: 2017-02-24
+Version: 0.2.0
+Date: 2017-02-25
 Author: Wolfgang Peter
 Maintainer: Wolfgang Peter <w.peter@statistik-peter.at>
 Description: STP25 ist eine Sammlung von Skripten zur Ergebnisdarstellung in APA-Style. Reports werden dabei als HTML ausgegeben.

@@ -5,8 +5,6 @@
 #' @param .data Daten
 #' @param ... alles an transform
 #' @export
-
-
 transform2<- function(.data, ...){
   label_data_frame(transform(.data, ...), GetLabelOrName(.data))
 }
@@ -137,15 +135,8 @@ else   res<- dapply2(res[-1:-2], function(z) factor(z, levels, labels))
   cf <- names(  res)
    res[order(nchar(cf), cf)]
 
-
   }else{
    label_data_frame(res, lbl)
   }
 
-
-
-
 }
-
-
-

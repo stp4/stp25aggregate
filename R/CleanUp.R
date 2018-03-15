@@ -237,16 +237,17 @@ cleanup_factor_levels_encoding <-
 Convert_To_Factor <- function(x) {
   # --labels lassen sich nicht direkt auslesen
 
-  lbl <- if (any(names(attributes(x)) == "label"))
-    attr(x, "label")
-  else
-    names(x)
+  lbl <- if (any(names(attributes(x)) == "label"))  attr(x, "label")  else  names(x)
+  
   lbls <- attr(x, "labels")
 
   #SPSS erlaubt leere Labels daher diese auffuellen
-  if(any(names(lbls)=="")){
-    empty<- which(names(lbls)=="")
-    names(lbls)[empty]<- empty
+  
+  if( any(names(lbls)=="") | any(names(lbls)=="&nbsp;") ){
+    spss_names <- gsub("&nbsp;", "", names(lbls))
+    
+    empty <- which(spss_names=="")
+    names(lbls)[empty] <- empty
   }
 
   x <- factor(x, lbls, names(lbls))
