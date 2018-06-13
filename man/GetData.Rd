@@ -62,3 +62,24 @@ zu ?bergeben. Bei hven werden zus?tzlich die Faktoren bereinigt.
  Hier erfolgt das Einlesen einfach ueber \code{load(File, ...)}, besser ist es daher direkt den Befehl zu verwenden.
  }
 }
+\examples{
+
+ dat<-GetData("
+sex treatment control
+m  2 3
+f  3 4
+",Tabel_Expand = TRUE, id.vars = 1)
+
+xtabs(~sex +value, dat)
+
+
+dat<-GetData("
+sex treatment  neg  pos 
+f   KG          3   3
+f   UG          4   5
+m   KG          5   4
+m   UG          4   2
+",Tabel_Expand = TRUE, id.vars = 1:2, value="befund")
+
+ftable(xtabs(~sex +treatment +befund, dat))
+}

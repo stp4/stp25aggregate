@@ -33,6 +33,27 @@ cleanup_names_encoding <-
   }
 
 
+
+
+Clean_String <-
+  function(x,
+           encoding = NULL,
+           #  from = "UTF8",
+           to = "latin1") {
+    if (!is.null(encoding))
+      if (is.logical(encoding))
+        x <-  rvest::repair_encoding(x)
+      else
+        x <- iconv(x, encoding , to)
+      x <- stringr::str_trim(x)
+      x <- stringr::str_replace_all(x, "\\p{quotation mark}", "'")
+      x <- gsub("[\\\n\\\t\\\r]", " ", x)
+      x <-   gsub(" +", " ", x)
+      
+      
+      x
+  }
+
 #' @rdname CleanUp
 #' @export
 #' @param uselabels Labels
@@ -48,7 +69,7 @@ CleanUp.default  <- function (data = NA,
                               na.strings = NULL,
                               force.numeric = FALSE,
                               ####alles zu Zahlen konvertieren
-                              encoding = NULL,
+                              encoding = TRUE,
                               #"UTF-8"
                               sep = ".",
                               #variable.labels   noch nicht getestet  attributes(data)$variable.labels,
@@ -57,37 +78,14 @@ CleanUp.default  <- function (data = NA,
                               variable.names = names(data),
                               ...)
 {
-  iconv.data.frame <-
-    function(df, from = "UTF8", to = "latin1", ...) {
-      df.names <- iconv(names(df), from , to)
-      df.rownames <- iconv(rownames(df), from , to)
-      df.label <- iconv(Hmisc::label(df),  from , to)
-
-      names(df) <- df.names
-      rownames(df) <- df.rownames
-      df.list <- lapply(df, function(x) {
-        if (any(class(x) == "factor")) {
-          levels(x)  <- iconv(levels(x), from , to)
-          x
-        } else if (any(class(x) == "character")) {
-          x <- iconv(x, from , to)
-        } else{
-          x
-        }
-      })
-      names(df.label) <- df.names
-
-      upData2(data.frame(df.list), labels = df.label)
-    }
-
-
   mylabels <-
-    variable.labels <-
     if (is.null(variable.labels))
       Hmisc::label(data)
   else
     variable.labels
-
+  
+  
+  
   mylabels <-
     gsub("[[:space:]]*$", "", mylabels) # alle Lehrzeichen am Ende
   if (uselabels) {
@@ -98,36 +96,132 @@ CleanUp.default  <- function (data = NA,
     # mylabels <-    gsub( ".\\s+","", mylabels ) # alle Lehrzeichen am Ende
   }
   mylabels <- ifelse(mylabels == "", names(mylabels), mylabels)
-
-  data <- data.frame(lapply(data, function(x) {
-    if (!is.null(na.strings))
-      x[which(x  %in%  na.strings)] <- NA
-    if (any(class(x) == "factor")) {
-      if (!force.numeric)
-        x <- factor(x)
-      else
-        x <- as.numeric(x)
-    }
-    # else if(any(class(x)=="character")){  if(!force.numeric)  x<-factor(x) else x<-as.numeric(factor(x)  }
-    else
-      x <- as.numeric(x)
-    return(x)
-  }))
+  
+  cat("\n First 20 Labels:")
+  print(mylabels[1:20])
+  
+  data <- data.frame(
+    lapply(data, 
+           function(x) {
+             # 1  NA-remove
+             if (!is.null(na.strings))
+               x[which(x  %in%  na.strings)] <- NA
+             
+             if (any(class(x) == "factor")) {
+               if (!force.numeric){
+                 levels(x) <- Clean_String(levels(x), encoding)
+                 factor(x,  levels(x))#sicherstellen dass nur Factor rauskommt
+               }
+               else{
+                 as.numeric(x)  # 2 to numeric 
+               }
+             }
+             else if(is.character(x)){  Clean_String(x, encoding)
+               #if(!force.numeric)  x<-factor(x) else x<-as.numeric(factor(x)
+             }
+             else if(is.integer(x)) {as.numeric(x)}
+             else if(is.atomic(x))  { as.numeric(x)}
+             else {x}
+           }
+    )
+  )
   if (uselabels)
     names(data) <- mylabels
   else {
     names(mylabels) <- names(data)
     #class(label(data))
     data <- label_data_frame(data, labels = mylabels)
-
+    
   }
-
-
-  if (!is.null(encoding))
-    data <- iconv.data.frame(data)
-  return(data)
+  
+  data 
 }
-
+# CleanUp.default  <- function (data = NA,
+#                               uselabels = FALSE,
+#                               ###labels von Hmisc  FALSE
+#                               na.strings = NULL,
+#                               force.numeric = FALSE,
+#                               ####alles zu Zahlen konvertieren
+#                               encoding = NULL,
+#                               #"UTF-8"
+#                               sep = ".",
+#                               #variable.labels   noch nicht getestet  attributes(data)$variable.labels,
+#                               variable.labels =  attributes(data)$variable.labels,
+#                               # Import von LimeSurvy
+#                               variable.names = names(data),
+#                               ...)
+# {
+#   iconv.data.frame <-
+#     function(df, from = "UTF8", to = "latin1", ...) {
+#       df.names <- iconv(names(df), from , to)
+#       df.rownames <- iconv(rownames(df), from , to)
+#       df.label <- iconv(Hmisc::label(df),  from , to)
+# 
+#       names(df) <- df.names
+#       rownames(df) <- df.rownames
+#       df.list <- lapply(df, function(x) {
+#         if (any(class(x) == "factor")) {
+#           levels(x)  <- iconv(levels(x), from , to)
+#           x
+#         } else if (any(class(x) == "character")) {
+#           x <- iconv(x, from , to)
+#         } else{
+#           x
+#         }
+#       })
+#       names(df.label) <- df.names
+# 
+#       upData2(data.frame(df.list), labels = df.label)
+#     }
+# 
+# 
+#   mylabels <-
+#     variable.labels <-
+#     if (is.null(variable.labels))
+#       Hmisc::label(data)
+#   else
+#     variable.labels
+# 
+#   mylabels <-
+#     gsub("[[:space:]]*$", "", mylabels) # alle Lehrzeichen am Ende
+#   if (uselabels) {
+#     mylabels <- gsub("[^[:alnum:]]", " ", mylabels)
+#     mylabels <- gsub("[ ]+", sep, mylabels)
+#     mylabels <-
+#       gsub(".$", "", mylabels) # alle Lehrzeichen am Ende
+#     # mylabels <-    gsub( ".\\s+","", mylabels ) # alle Lehrzeichen am Ende
+#   }
+#   mylabels <- ifelse(mylabels == "", names(mylabels), mylabels)
+# 
+#   data <- data.frame(lapply(data, function(x) {
+#     if (!is.null(na.strings))
+#       x[which(x  %in%  na.strings)] <- NA
+#     if (any(class(x) == "factor")) {
+#       if (!force.numeric)
+#         x <- factor(x)
+#       else
+#         x <- as.numeric(x)
+#     }
+#     # else if(any(class(x)=="character")){  if(!force.numeric)  x<-factor(x) else x<-as.numeric(factor(x)  }
+#     else
+#       x <- as.numeric(x)
+#     return(x)
+#   }))
+#   if (uselabels)
+#     names(data) <- mylabels
+#   else {
+#     names(mylabels) <- names(data)
+#     #class(label(data))
+#     data <- label_data_frame(data, labels = mylabels)
+# 
+#   }
+# 
+# 
+#   if (!is.null(encoding))
+#     data <- iconv.data.frame(data)
+#   return(data)
+# }
+# 
 
 
 
