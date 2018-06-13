@@ -40,6 +40,26 @@
 #' @param user_na	If TRUE variables with user defined missing will be read into labelled_spss objects. If FALSE, the default, user-defined missings will be converted to NA.
 #' @param ...  Argumente fuer spss und csv. Bei SPSS-Files  kann die Zeichencodierung mit  \code{reencode ="UTF-8"} geaendert werden.
 #' @export
+#' @examples 
+#' 
+#'  dat<-GetData("
+#' sex treatment control
+#' m  2 3
+#' f  3 4
+#' ",Tabel_Expand = TRUE, id.vars = 1)
+#' 
+#' xtabs(~sex +value, dat)
+#' 
+#' 
+#' dat<-GetData("
+#' sex treatment  neg  pos 
+#' f   KG          3   3
+#' f   UG          4   5
+#' m   KG          5   4
+#' m   UG          4   2
+#' ",Tabel_Expand = TRUE, id.vars = 1:2, value="befund")
+#' 
+#' ftable(xtabs(~sex +treatment +befund, dat))
 
 GetData <- function (File = NA,
             na.strings = NULL,
@@ -156,6 +176,9 @@ GetData <- function (File = NA,
                 }
 
     TabelToExpandDataFrame <- function(myData, id.vars, value = "value") {
+      
+
+      
                 expand.dft <-
                   function(x,
                            na.strings = "NA",
@@ -186,6 +209,8 @@ GetData <- function (File = NA,
                     }
                     myData
                   }
+                
+                
                 # library(reshape2)
                 if (!is.data.frame(myData))
                   myData <-
@@ -205,6 +230,7 @@ GetData <- function (File = NA,
                   myData2 <-
                     expand.dft(as.data.frame(as.table(myDataMatrix), stringsAsFactors = TRUE))
                   colnames(myData2)[2] <- value
+                  
                   myData2 <-
                     cbind(reshape2::colsplit(myData2[, 1], "\\+", names(myData)[id.vars]),  myData2)
                 }
@@ -215,6 +241,11 @@ GetData <- function (File = NA,
                       factor(x)
                     else
                       x))
+                if(length(id.vars)==1)  {
+                  names(myData2)[1] <-names(myData)[id.vars]
+                }
+              
+                
                 myData2
               }
 
