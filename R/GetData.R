@@ -206,7 +206,7 @@ GetData <- function (File = NA,
                     expand.dft(as.data.frame(as.table(myDataMatrix), stringsAsFactors = TRUE))
                   colnames(myData2)[2] <- value
                   myData2 <-
-                    cbind(colsplit(myData2[, 1], "\\+", names(myData)[id.vars]),  myData2)
+                    cbind(reshape2::colsplit(myData2[, 1], "\\+", names(myData)[id.vars]),  myData2)
                 }
 
                 myData2 <-
