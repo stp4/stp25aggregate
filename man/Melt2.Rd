@@ -10,9 +10,9 @@
 \usage{
 Melt2(x, ...)
 
-\method{Melt2}{formula}(x, data, key = "variable", value = "value", subset,
-  na.action = na.pass, X = stp25APA2::Formula_Data(x, data, subset,
-  na.action), id.vars = X$xname, ...)
+\method{Melt2}{formula}(x, data, key = "variable", value = "value",
+  subset, na.action = na.pass, X = stp25APA2::Formula_Data(x, data,
+  subset, na.action), id.vars = X$xname, ...)
 
 \method{Melt2}{data.frame}(x, ..., key = "variable", value = "value")
 

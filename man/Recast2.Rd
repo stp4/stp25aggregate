@@ -5,9 +5,10 @@
 \title{Recast2}
 \usage{
 Recast2(Formula, data, fun = NULL, key = "variable", value = "value",
-  subset, na.action = na.omit, X = stp25APA2::Formula_Data(Formula, data,
-  subset, na.action), id.vars = X$xname, measure.var, formula = NULL,
-  labels = TRUE, margins = FALSE, margins_name = "gesamt", ...)
+  subset, na.action = na.omit, X = stp25APA2::Formula_Data(Formula,
+  data, subset, na.action), id.vars = X$xname, measure.var,
+  formula = NULL, labels = TRUE, margins = FALSE,
+  margins_name = "gesamt", ...)
 }
 \arguments{
 \item{Formula}{Formula-Objekt}

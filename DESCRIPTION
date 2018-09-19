@@ -1,9 +1,9 @@
 Package: stp25aggregate
 Type: Package
 Encoding: UTF-8
-Title: Reports und Auswertungen
-Version: 0.2.0
-Date: 2017-02-25
+Title: Aggregieren von Daten
+Version: 0.2.1
+Date: 2018-09-19
 Author: Wolfgang Peter
 Maintainer: Wolfgang Peter <w.peter@statistik-peter.at>
 Description: STP25 ist eine Sammlung von Skripten zur Ergebnisdarstellung in APA-Style. Reports werden dabei als HTML ausgegeben.
@@ -12,13 +12,8 @@ Depends:
     R (>= 3.2)
 Imports: stats, utils, Hmisc, magrittr, car
 Suggests:
-    haven, knitr, rmarkdown, reshape2,
-    testthat, stringr, R2HTML,
-    texreg, htmlTable,
-    caret, diagram, vcd, latticeExtra,
-    installr, RColorBrewer, lmtest, Formula,
-    effects, broom, dplyr, tidyr,
-    lattice, lmerTest, stp5
+    haven, reshape2, testthat, stringr,
+    installr, Formula, dplyr, tidyr
 VignetteBuilder: knitr
 LazyData: TRUE
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0

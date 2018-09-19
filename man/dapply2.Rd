@@ -4,12 +4,15 @@
 \alias{dapply2}
 \title{Apply mit Hmisc labels}
 \usage{
-dapply2(.data, fun = function(x) as.numeric(x), ...)
+dapply2(.data, fun = function(x) as.numeric(x),
+  stringsAsFactors = default.stringsAsFactors(), ...)
 }
 \arguments{
 \item{.data}{Data.frame}
 
 \item{fun}{funktion}
+
+\item{stringsAsFactors}{logical: should character vectors be converted to factors?}
 
 \item{...}{Weitere Argumente an llply}
 }
