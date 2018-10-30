@@ -10,7 +10,7 @@ Description: STP25 ist eine Sammlung von Skripten zur Ergebnisdarstellung in APA
 License: GPL-3
 Depends:
     R (>= 3.2)
-Imports: stats, utils, Hmisc, magrittr, car
+Imports: stats, utils, Hmisc, magrittr, car, knitr
 Suggests:
     haven, reshape2, testthat, stringr,
     installr, Formula, dplyr, tidyr
