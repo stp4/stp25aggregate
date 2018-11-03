@@ -5,10 +5,9 @@
 #' @name Melt2
 #' @rdname Melt2
 #' @param x Objekt kann Formel oder data.frame sein
-#' @param ... weitere Argumente
-#' @seealso \link[reshape2]{melt} und \link[reshape2]{dcast}
+#' @param ... weitere Argument
 #'
-#' @return Dataframe in Langform
+#' @return Dataframe in Langfor
 #' @export
 Melt2 <- function(x, ...) {
   UseMethod("Melt2")
@@ -38,18 +37,17 @@ Melt2.formula <-   function(x,
                             value = "value",
                             subset,
                             na.action =  na.pass,
-                            X = stp25APA2::Formula_Data(x,
+                            X = stp25formula::prepare_data2(x,
                                                         data,
                                                         subset,
                                                         na.action),
-                            id.vars = X$xname,
+                            id.vars = X$group.vars,
                             ...) {
-  data <- if (is.null(X$X_data))
-    X$Y_data
-  else
-    cbind(X$X_data, X$Y_data)
-  molten <- reshape2::melt(data, id.vars, ...)
-  value_labels <- GetLabelOrName(X$Y_data)
+ 
+  
+  
+  molten <- reshape2::melt(X$data, id.vars, ...)
+  value_labels <- GetLabelOrName(X$data[X$measure.vars])
   molten$variable <-
     factor(molten$variable, names(value_labels), value_labels)
 
