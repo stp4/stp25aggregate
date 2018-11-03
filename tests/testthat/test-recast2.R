@@ -1,4 +1,5 @@
 context("test-recast2")
+library(stp25data)
 
 test_that("mean works", {
   dat <- data.frame(
@@ -17,4 +18,17 @@ test_that("mean works", {
     value  = c(1, 3, 5, 2, 4, 6)
   )
   )
+  
+  
+  
+  hyper1<-hyper[, c("g","chol0","chol1","chol6","chol12")]
+  hyper_long<- reshape2::melt(hyper1, id.vars=1)
+  
+ 
+  expect_equal(
+  aggregate( value~variable+g, hyper_long, mean)$value,
+  Recast2(chol0+chol1+chol6+chol12~g, hyper, mean)$value) 
+  
+  
+  
 })

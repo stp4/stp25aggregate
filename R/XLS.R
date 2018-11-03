@@ -20,12 +20,12 @@ XLS <- function(...,
     which(myLetters %in% ltr)
   }
   ltr <- toupper(as.character(sys.call())[-1])
-
+  
   xrange <- grep("\\:", ltr)
   n <- 0
   if (length(xrange)) {
     for (i in 1:length(xrange)) {
-      x <- xrange[i]
+      #x <- xrange[i]
       posn <- xrange[i] + n - i + 1
       mltr <- unlist(strsplit(ltr[posn], "\\:"))
       myRange <- myLetters[letter_num(mltr[1]):letter_num(mltr[2])]

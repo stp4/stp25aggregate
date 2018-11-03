@@ -11,8 +11,8 @@
 Melt2(x, ...)
 
 \method{Melt2}{formula}(x, data, key = "variable", value = "value",
-  subset, na.action = na.pass, X = stp25APA2::Formula_Data(x, data,
-  subset, na.action), id.vars = X$xname, ...)
+  subset, na.action = na.pass, X = stp25formula::prepare_data2(x, data,
+  subset, na.action), id.vars = X$group.vars, ...)
 
 \method{Melt2}{data.frame}(x, ..., key = "variable", value = "value")
 
@@ -23,7 +23,7 @@ melt2(x, ..., by = "1")
 \arguments{
 \item{x}{Objekt kann Formel oder data.frame sein}
 
-\item{...}{weitere Argumente}
+\item{...}{weitere Argument}
 
 \item{data}{Daten}
 
@@ -44,7 +44,7 @@ melt2(x, ..., by = "1")
 \item{...}{weitere Argumente an melt}
 }
 \value{
-Dataframe in Langform
+Dataframe in Langfor
 }
 \description{
 Umformen von einem Breit-Format nach einem Lang-Format. Melt2 und melt2 sind
@@ -79,7 +79,4 @@ x <- hyper  \%>\%
 
  head( x<- hyper \%>\%  melt2(chol0,chol1,chol6,chol12, by=~g))
  #APA2(~.,x)
-}
-\seealso{
-\link[reshape2]{melt} und \link[reshape2]{dcast}
 }

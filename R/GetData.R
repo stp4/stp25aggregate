@@ -79,7 +79,7 @@ GetData <- function (File = NA,
               function(df, from = "UTF8", to = "latin1", ...) {
                 df.names <- iconv(names(df), from, to)
                 df.rownames <- iconv(rownames(df), from, to)
-                df.label <- iconv(Hmisc::label(df), from , to)
+               # df.label <- iconv(Hmisc::label(df), from , to)
 
                 names(df) <- df.names
                 rownames(df) <- df.rownames
@@ -290,7 +290,7 @@ GetData <- function (File = NA,
                             ", Missing=", sum(is.na(myData))
                   )
 
-                  Text(Data_info)
+                  stp25output::Text(Data_info)
             }# --if else file exist
             else {
                   cat(paste("Kein File mit namen: ", File, "vorhanden"))

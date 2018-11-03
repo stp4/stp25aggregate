@@ -126,3 +126,9 @@ as_time <- function(x, na.strings = NULL) {
   
   
 }
+
+clean_space <- function(x) {
+  x <- sub("[[:space:]]+$", "", x)
+  x <- sub("^[[:space:]]+", "", x)
+  sub(",", ".", x)
+}
