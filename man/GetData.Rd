@@ -7,10 +7,13 @@
 GetData(File = NA, na.strings = NULL, force.numeric = FALSE,
   Tabel_Expand = FALSE, id.vars = 1, value = "value",
   Data_info = date(), sep = ";", quote = "\\"", dec = ".",
-  user_na = FALSE, reencode = FALSE, ...)
+  user_na = FALSE, reencode = FALSE, output = TRUE, ...)
 }
 \arguments{
-\item{File}{Demo.xla, Demo.sav, Demo.csv  - ist ein Pfad zu einem csv, xls, sav oder Rdata Datensatz oder ein String in Textformat dierekt im R-File.}
+\item{File}{Demo.xla, 
+Demo.sav, 
+Demo.csv  - ist ein Pfad zu einem csv, xls, sav oder Rdata Datensatz 
+oder ein String in Textformat dierekt im R-File.}
 
 \item{na.strings}{c(NA,9999,"") - Fehlende Werte}
 
@@ -34,6 +37,8 @@ GetData(File = NA, na.strings = NULL, force.numeric = FALSE,
 
 \item{reencode}{UTF-8 = FALSE,}
 
+\item{output}{Text Info zu File}
+
 \item{...}{Argumente fuer spss und csv. Bei SPSS-Files  kann die Zeichencodierung mit  \code{reencode ="UTF-8"} geaendert werden.}
 }
 \description{
@@ -55,8 +60,10 @@ Neu ist das  die Default-Option   spss.get() is  um mit haven zu Arbeitenist als
 zu ?bergeben. Bei hven werden zus?tzlich die Faktoren bereinigt.
   }
 \subsection{LimeSurvy}{
- Hier muss eine Liste uebergeben werden die die Filenamen beinhaltet also \code{GetData(list("file.R","file.txt"))}.
- Das erste File ist das R-File mit den Labels das zweite die Daten. Weitere moegliche Parameter sind die Zeichencodierung.
+ Hier muss eine Liste uebergeben werden die die Filenamen beinhaltet 
+ also \code{GetData(list("file.R","file.txt"))}.
+ Das erste File ist das R-File mit den Labels das zweite die Daten. 
+ Weitere moegliche Parameter sind die Zeichencodierung.
  }
 \subsection{RData}{
  Hier erfolgt das Einlesen einfach ueber \code{load(File, ...)}, besser ist es daher direkt den Befehl zu verwenden.

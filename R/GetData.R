@@ -19,14 +19,19 @@
 #' zu ?bergeben. Bei hven werden zus?tzlich die Faktoren bereinigt.
 #'   }
 #' \subsection{LimeSurvy}{
-#'  Hier muss eine Liste uebergeben werden die die Filenamen beinhaltet also \code{GetData(list("file.R","file.txt"))}.
-#'  Das erste File ist das R-File mit den Labels das zweite die Daten. Weitere moegliche Parameter sind die Zeichencodierung.
+#'  Hier muss eine Liste uebergeben werden die die Filenamen beinhaltet 
+#'  also \code{GetData(list("file.R","file.txt"))}.
+#'  Das erste File ist das R-File mit den Labels das zweite die Daten. 
+#'  Weitere moegliche Parameter sind die Zeichencodierung.
 #'  }
 #' \subsection{RData}{
 #'  Hier erfolgt das Einlesen einfach ueber \code{load(File, ...)}, besser ist es daher direkt den Befehl zu verwenden.
 #'  }
 #'
-#' @param File Demo.xla, Demo.sav, Demo.csv  - ist ein Pfad zu einem csv, xls, sav oder Rdata Datensatz oder ein String in Textformat dierekt im R-File.
+#' @param File Demo.xla, 
+#' Demo.sav, 
+#' Demo.csv  - ist ein Pfad zu einem csv, xls, sav oder Rdata Datensatz 
+#' oder ein String in Textformat dierekt im R-File.
 #' @param na.strings c(NA,9999,"") - Fehlende Werte
 #' @param force.numeric logical FALSE
 #' @param Tabel_Expand logical FALSE - Tabellen mit haufigkeiten werden als Dataframe im long-Format ausgegeben
@@ -38,6 +43,7 @@
 #' @param dec  Lesen der csv- Files = ".",
 #' @param reencode  UTF-8 = FALSE,
 #' @param user_na	If TRUE variables with user defined missing will be read into labelled_spss objects. If FALSE, the default, user-defined missings will be converted to NA.
+#' @param output Text Info zu File
 #' @param ...  Argumente fuer spss und csv. Bei SPSS-Files  kann die Zeichencodierung mit  \code{reencode ="UTF-8"} geaendert werden.
 #' @export
 #' @examples 
@@ -73,8 +79,10 @@ GetData <- function (File = NA,
             dec = ".",
             user_na=FALSE,
             reencode = FALSE,
+            output=TRUE,
             ...)
             {
+
     iconv.data.frame <-
               function(df, from = "UTF8", to = "latin1", ...) {
                 df.names <- iconv(names(df), from, to)
@@ -252,24 +260,24 @@ GetData <- function (File = NA,
               #-- Begin der Funktion -------------------------------------------------
     myData <- data.frame(NULL)
     file_info <- "Text "
-    cat("\n\nFile: \n", File, " ", class(File))
+    note <- paste("\n\nFile: \n", File, " ", class(File))
 
     # 15.11.2013 09:47:26
     if (is.list(File)) {
-                cat("\n\nLimeSurvy\n")
+      note <- paste(note,"\n\nLimeSurvy\n")
                 myData <- LimeSurvy(File)
     }
     else if (length(grep("\n", File)) > 0) {
-                cat("\n\nread.text2\n")
+      note <- paste(note,"\n\nread.text2\n")
                 myData <- read.text2(File, ...)
     }
     else {
                 # sonstige Datafiles
           if (file.exists(File)) {
                   file_info <- file.info(File)[c(1, 4, 5)]
-                  cat("\n\nfile_info\n")
+                  note <- paste(note,"\n\nfile_info\n")
                   ext <- tolower(tools::file_ext(File))
-                  cat("\n\next\n")
+                  note <- paste(note,"\n\next\n")
                   myData <- switch(
                     ext,
                     sav = CleanUp_factor(haven::read_sav(File, user_na = user_na)),
@@ -290,10 +298,10 @@ GetData <- function (File = NA,
                             ", Missing=", sum(is.na(myData))
                   )
 
-                  stp25output::Text(Data_info)
+                   
             }# --if else file exist
             else {
-                  cat(paste("Kein File mit namen: ", File, "vorhanden"))
+              note <- paste(note,"Kein File mit namen: ", File, "vorhanden") 
         }
       } #Elsw sonstige Files
 
@@ -310,5 +318,9 @@ GetData <- function (File = NA,
                   TabelToExpandDataFrame(myData, id.vars = id.vars, value = value, ...)
       }
       comment(myData) <- Data_info
+      if(output){ 
+        Text(note)
+        Text(Data_info)
+         }
       myData
 }
