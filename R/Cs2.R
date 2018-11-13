@@ -3,7 +3,6 @@
 #' Erweiterung der  Hmisc Cs-Funktion um trim.ws. Erlaubt Variablen mit Komma oder Plus(+) oder Leerzeichen abzuternnen.
 #' @param ... Vektor oder String oder Formula
 #' @return Vektor
-#' @seealso \link{Cs}
 #' @export
 #' @examples
 #' Cs2(sd,fr,fg)
@@ -12,7 +11,6 @@
 #' Cs2("~ sd +    fr + fg")
 Cs2 <-
   function (...)
-    #-- Erweiterung der Function c und Cs und Trim.ws Input: Character Output Vector
   {
     # library(Hmisc)
     trim_ws <-
@@ -28,7 +26,6 @@ Cs2 <-
     if (length(x) == 1)
       x <- trim_ws(x)
     if (Hmisc::all.is.numeric(levels(factor(x))))
-      ##- library(Hmisc)
       x <- as.numeric(as.character(x))
     x
   }

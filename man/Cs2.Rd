@@ -21,6 +21,3 @@ Cs2(sd,fr,fg, "hju nh")
 Cs2("  Hallo Welt ")
 Cs2("~ sd +    fr + fg")
 }
-\seealso{
-\link{Cs}
-}
