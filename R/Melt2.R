@@ -117,7 +117,7 @@ melt2 <-
     if (length(meAsNum) != 0)
       measure[meAsNum] <- names(x[as.numeric(measure[meAsNum])])
 
-    if (stpvers::is_formula2(by))
+    if (is_formula2(by))
       by <- all.vars(by)
 
     res <- reshape2::melt (

@@ -96,7 +96,7 @@ Recast2 <- function(Formula,
     default_formula <- FALSE
   }
 
-  if (!stpvers::all_identical2(X$Y_data)) {
+  if (!all_identical2(X$Y_data)) {
     print(head(X$Y_data))
     cat("\nNicht berechenbar da falsche Skalenniveau (Faktor und Zahlen gemischt!)\n")
     return(NULL)
@@ -123,7 +123,7 @@ Recast2 <- function(Formula,
       factor(molten$variable, names(value_labels), value_labels2)
   }
   #-------------------------------------------------------------------------------
-  if (default_formula & (stpvers:::isFALSE(margins))) {
+  if (default_formula & (isFALSE(margins))) {
     result <-  reshape2::dcast(molten, formula, fun, ...)
     if (labels & (!is.null(group_labels)))
        result <-   label_data_frame(result, labels = group_labels)
