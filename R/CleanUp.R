@@ -227,80 +227,41 @@ CleanUp.default  <- function (data = NA,
 
 
 #' @rdname CleanUp
+#' @description CleanUp_factor bereinigen von haven Label
 #' @export
-CleanUp_factor <- function(data, ...) {
-  y <- sapply(data, function(x)
-    inherits(x, "labelled"))
-  if (sum(y) > 0)
-    data[y] <- lapply(data[y], Convert_To_Factor)
-  if (inherits(data, "tbl_df"))
-    data
-  else
-    dplyr::tbl_df(data)
-}
-
-
-
-
-#' @rdname CleanUp
-#' @description Die Funktion \code{Label()} erstellt die
-#' Labels die bei den Tabellen
-#' verwendet werden. Im Unterschied zu \code{UpData2()} arbeitet diese Funktion mit
-#'   (...) argument.
-#' @export
-#' @examples
-#'
-#' #-- Label
-#' # Steko<- GetData("Steko.sav") %>%
-#' # Drop_NA(key) %>%
-#' #   mutate(jahr = factor(jahr)) %>%
-#' #   Label( BMI = "Body-Mass-Index",
-#' #         WHtR =  "Waist-Height-Ratio",
-#' #         WHtR_1 ="Waist-Height-Ratio",
-#' #         bildprof = "Bildungsprofil",
-#' #         jahr = "Jahr")
-#' #
-#' # MobilePayment %>%
-#' #  select(Q2_1:Q2_4) %>%
-#' #   Label("Computer", "Laptop", "Tablet", "Mobiltelefon" )
-#'
-Label<- function(data, ...){
-    my_labels<- list(...)
-    if (length(my_labels) == 0) {
-        cat("\\nLabel: Keine Labels gefunden!\\n")
-        return(data)
-    }else{
-        if(is.null(names(my_labels))) {
-          cat("\\nLabel: Keine Namen gefunden! Verwende daher names(data)\n" )
-          names(my_labels) <-  names(data)[1:length(my_labels)]
-        }
-        label_data_frame(data, my_labels)
-    }
-}
-
-
-
-
-#' @rdname CleanUp
-#' @export
-#' @param labels Labels
-label_data_frame <- function(data, labels = NULL) {
-  if (is.null(labels)) {
-    cat("\nlabel_data_frame: Keine Labels gefunden!\n")
-    return(data)
-  } else {
-    no <- names(data)
-    nl <- no %in% names(labels)
-    if (sum(nl) > 0) {
-      for (n in no[nl])
-        attr(data[[n]], "label") <- labels[[n]]
-      return(data)
-    }
-  #  cat("\nlabel_data_frame: Falsche Labels gefunden!\n")
-   # print(names(labels))
-    return(data)
+CleanUp_factor <-
+  function(data, ...) {
+    #09-01-2019 aenderung in haven haven_labelled
+    y <- sapply(data, function(x) {
+      if (inherits(x, "haven_labelled"))
+        TRUE
+      else if (inherits(x, "labelled"))
+        TRUE
+      else
+        FALSE
+    })
+    
+    if (sum(y) > 0)
+      data[which(y)] <-
+        lapply(data[which(y)], Convert_To_Factor)
+    if (inherits(data, "tbl_df"))
+      data
+    else
+      dplyr::tbl_df(data)
   }
-}
+
+
+
+# CleanUp_factor <- function(data, ...) {
+#   y <- sapply(data, function(x)
+#     inherits(x, "labelled"))
+#   if (sum(y) > 0)
+#     data[y] <- lapply(data[y], Convert_To_Factor)
+#   if (inherits(data, "tbl_df"))
+#     data
+#   else
+#     dplyr::tbl_df(data)
+# }
 
 
 
