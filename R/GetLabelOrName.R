@@ -27,6 +27,19 @@ GetLabelOrName <- function(x,
     xlabel <-
       ifelse(xlabel == "", df_names, xlabel)
 
+    
+    is_units <- sapply(x, function(z) inherits(z, "units"))
+    if (any(is_units)) {
+      my_units <-
+        sapply(x, function(z)
+          if (inherits(z, "units"))
+            paste0(" [", as.character(attr(z, "units")), "]"  )
+          else "")
+      
+      xlabel <-  paste0(xlabel, my_units )
+      
+    }
+    
     names(xlabel) <- xnames
     return(xlabel)
   }
