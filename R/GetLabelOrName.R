@@ -44,3 +44,6 @@ GetLabelOrName <- function(x,
     return(xlabel)
   }
 }
+
+
+GetLabels <- GetLabelOrName
