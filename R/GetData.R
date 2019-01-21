@@ -66,6 +66,21 @@
 #' ",Tabel_Expand = TRUE, id.vars = 1:2, value="befund")
 #' 
 #' ftable(xtabs(~sex +treatment +befund, dat))
+#' 
+#' 
+#' 
+#' 
+#'  dat1 <- rockchalk::genCorrelatedData(N=250, 
+#' means=c(100,100),
+#' sds=c(30,20), 
+#' rho=0.0,  stde = 7, 
+#' beta=c(1.1, 2.4, 4.1, 0))
+#' 
+#' #summary(dat1)
+#' #m1 <- lm(y ~ x1 + x2, data=dat1)
+#' #' 
+#' #' 
+#' #' 
 
 GetData <- function (File = NA,
             na.strings = NULL,
