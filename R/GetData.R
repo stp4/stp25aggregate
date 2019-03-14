@@ -334,8 +334,8 @@ GetData <- function (File = NA,
       }
       comment(myData) <- Data_info
       if(output){ 
-        Text(note)
-        Text(Data_info)
+        stp25output::Text(note)
+        stp25output::Text(Data_info)
          }
       myData
 }
