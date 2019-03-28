@@ -184,7 +184,8 @@ GetData <- function (File = NA,
                 function (Lines,
                           na.strings = c("NA", "na"),
                           sep = "\t",
-                          dec = ".") {
+                          dec = ".",
+                          stringsAsFactors=TRUE) {
                   cleanup <- function(x) {
                     gsub(sep, " ", x)
                   }
@@ -192,7 +193,8 @@ GetData <- function (File = NA,
                     zz <- textConnection(cleanup(Lines)),
                     header = TRUE,
                     dec = dec,
-                    na.strings = na.strings
+                    na.strings = na.strings,
+                    stringsAsFactors=stringsAsFactors
                   )
                   close(zz)
                   myData
@@ -272,7 +274,7 @@ GetData <- function (File = NA,
                 myData2
               }
 
-              #-- Begin der Funktion -------------------------------------------------
+    #-- Begin der Funktion -------------------------------------------------
     myData <- data.frame(NULL)
     file_info <- "Text "
     note <- paste("\n\nFile: \n", File, " ", class(File))
