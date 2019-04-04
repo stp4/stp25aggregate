@@ -7,7 +7,7 @@
 #' @param data   Daten
 #' @param fun Agregat Funktion
 #' @param key,value Names of new key and value columns, as strings
-#' @param subset,na.action  fuer Formula
+#' @param subset,na.action  fuer Formula na.action = na.omit, na.pass, na.exclude, na.fail
 #' @param formula  zum vertauchen von Spalten Argument an dcast
 #' @param labels sollen Hmisc levels verwendet werden
 #' @param margins Gesamtwert bei TRUE eigene Funktion sonst dcast
@@ -66,7 +66,7 @@ Recast2 <- function(Formula,
                     na.action = na.omit,
 
 
-                    X = stp25APA2::Formula_Data(Formula, data, subset, na.action),
+                    X = stp25formula::Formula_Data(Formula, data, subset, na.action),
                     id.vars = X$xname,
                     measure.var,
                     formula = NULL,
