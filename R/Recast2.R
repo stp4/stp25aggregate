@@ -63,7 +63,7 @@ Recast2 <- function(Formula,
                     key = "variable", value = "value",
 
                     subset,
-                    na.action = na.omit,
+                    na.action = na.pass,
 
 
                     X = stp25formula::Formula_Data(Formula, data, subset, na.action),
