@@ -1,4 +1,4 @@
-#' Recast2
+#' Summarise Data
 #'
 #' @description  Erweiterung der recast-Funktion. Erwartet einen data.frame
 #' mit \code{label} und verwendet die \code{melt} und \code{dcast}  Funftionen
@@ -61,12 +61,12 @@ Recast2 <- function(Formula,
                     data,
                     fun = NULL,
                     key = "variable", value = "value",
-
                     subset,
                     na.action = na.pass,
-
-
-                    X = stp25formula::Formula_Data(Formula, data, subset, na.action),
+                    X = stp25formula::Formula_Data(Formula, 
+                                                   data, 
+                                                   subset, 
+                                                   na.action),
                     id.vars = X$xname,
                     measure.var,
                     formula = NULL,
@@ -182,3 +182,63 @@ Recast2 <- function(Formula,
 }
 
 
+#' @rdname Recast2
+#' @export
+Summarise <- function(x,
+                      .data,
+                      fun = NULL,
+                      key = "variable",
+                      value = "value",
+                      subset,
+                      na.action = na.pass,
+                      X = stp25formula::Formula_Data(x, .data, subset, na.action),
+                      id.vars = X$xname,
+                      measure.var,
+                      formula = NULL,
+                      labels = TRUE,
+                      margins = FALSE,
+                      margins_name = "gesamt",
+                      key.levels = NULL,
+                      ...) {
+funny <- list(...)
+  
+  if (length(funny) == 0) {
+    res<-  Recast2(
+      x,.data,fun, key, value,subset,
+      na.action,X,id.vars,
+      measure.var,formula,
+      labels, margins,
+      margins_name
+    )
+  }
+  else{
+    res <-
+      Recast2(
+        x,  .data,  fun = funny[[1]],
+        key,  value = names(funny)[1],  subset,
+        na.action,  X,  id.vars,
+        measure.var,  formula = NULL,  labels,
+        margins = FALSE,  margins_name
+      )
+    
+    if (length(funny) > 1)
+    {
+      for (i in names(funny)[-1]) {
+        next_res <- Recast2(
+          x, .data,   fun = funny[[i]],
+          key, value = i, subset, na.action, X, id.vars, measure.var, formula = NULL,
+          labels, margins = FALSE,
+          margins_name
+        )
+        res <-  cbind(res, next_res[ncol(next_res)])
+      }
+    }
+  }
+  
+  if(!is.null(key.levels)){
+    levels(res[,key]) <- key.levels
+    
+  }
+  
+  res
+}
