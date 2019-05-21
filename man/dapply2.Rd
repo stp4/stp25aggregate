@@ -2,10 +2,18 @@
 % Please edit documentation in R/dapply2.R
 \name{dapply2}
 \alias{dapply2}
+\alias{Dapply.formula}
+\alias{Dapply.data.frame}
 \title{Apply mit Hmisc labels}
 \usage{
 dapply2(.data, fun = function(x) as.numeric(x),
   stringsAsFactors = default.stringsAsFactors(), ...)
+
+\method{Dapply}{formula}(x, .data, fun = function(x) as.numeric(x),
+  stringsAsFactors = default.stringsAsFactors())
+
+\method{Dapply}{data.frame}(.data, ..., fun = function(x) as.numeric(x),
+  stringsAsFactors = default.stringsAsFactors())
 }
 \arguments{
 \item{.data}{Data.frame}

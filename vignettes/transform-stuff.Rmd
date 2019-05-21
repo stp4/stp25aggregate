@@ -1,0 +1,272 @@
+---
+title: "How to do transform stuff"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{How to do transform stuff}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+library(knitr)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, include=FALSE}
+library(stp25aggregate)
+library(stp25data)
+library(tidyverse)
+
+hyper$chol0[c(1,5)]<- NA
+hyper$rrs0[c(2,5)]<- NA
+
+hyper$rrd0[c(3,5)]<- NA
+
+```
+
+
+##  Long
+
+Umformen von einem Breit-Format nach einem Lang-Format. Melt2 und melt2 sind
+Erweiterungen der reshape2::melt Funktion. Intern wird  *melt* und *dcast* verwendet.
+
+
+### Wie reshape2::melt 
+
+```{r Melt2-data-frame}
+#Melt2
+hyper_smal  <- hyper[, c("g","chol0","chol1","chol6","chol12")]
+data_long  <- Long(hyper_smal, id.vars=1, key = "time", value = "chol")
+ head(data_long)
+
+```
+### Alternative mit tidyr
+
+Aber ohne die Labels.
+
+```{r tidyr-data-frame}
+ data_long <- hyper  %>%
+ tidyr::gather("time", "chol", chol0:chol12) %>%
+     dplyr::select(g, time, chol)
+head(data_long)
+
+```
+
+
+### Formula
+
+
+```{r}
+  head(x<-Long(chol0+chol1+chol6+chol12~g , hyper))
+ 
+```
+
+
+### Pipe
+
+```{r}
+ 
+  head( x<- hyper %>%  Long(chol0,chol1,chol6,chol12, by=~g))
+ 
+```
+
+
+### Ohne id
+
+
+```{r}
+hyper2 <- hyper[, c("chol0", "chol1", "chol6", "chol12")]
+
+
+head(hyper_long <- Long(~chol0+chol1+chol6+chol12, hyper2, key = "time", value = "chol"))
+ 
+head(hyper_long <- Long(hyper2, key = "time", value = "chol"))
+
+```
+
+
+
+### Liste
+
+```{r}
+
+hyper_long <- Long(
+  list(
+    chol = c("chol0", "chol1", "chol6", "chol12"),
+    rrs = c("rrs0",  "rrs1" , "rrs6" , "rrs12"),
+    rrd = c("rrd0" , "rrd1", "rrd6", "rrd12")
+  ),
+  hyper,
+  by =  ~ g,
+  key = "Zeit",
+  key.levels = c("Ausgangswert", "1 Monat", "6 Monate", "12 Monate")
+)
+
+ rbind( hyper_long[1:5,], dplyr::sample_n(hyper_long,5 ))
+```
+
+
+## Tranformieren apply mit formula
+
+
+Mischung usd der  plyr::llply  und  data.frame-Funktion.
+Wenn keine Funktion uebergeben wird wird der Datensatz zu Zahlen transformiert.
+
+```{r}
+funy <- function(x)
+  cut(x, 3, c("low", "med", "hig"))
+
+res1 <-
+  Dapply( ~ a  +  gr  + gew + chol0 + chol1 + chol6,
+          hyper,
+          fun = funy)
+res2 <-
+  Dapply(hyper,   a, gr, gew, chol0, chol1, chol6, fun = funy)
+
+
+vrs<- c("nr", "med", "a", "gr", "gew", "chol0", "chol1", "chol6")
+
+ rbind(res1[1:5, vrs], res2[1:5, vrs])
+
+```
+
+
+
+## Berechnen
+
+###  base::aggregare
+
+```{r}
+funny<- function(x) round(mean(x),1)
+ 
+hyper_long <- Long(hyper, chol0, chol1, chol6, chol12, by=~g)
+aggregate( value~variable, hyper_long, funny) %>% 
+  kable(caption="aggregate")
+
+
+
+hyper_long<-Long(chol0+chol1+chol6+chol12~g,
+                  hyper, "Zeit", "Cholesterin")
+#-- Spread + aggragate
+aggregate(Cholesterin~Zeit+g, hyper_long, funny) %>%
+  spread(g, Cholesterin) %>% 
+  kable(caption="aggregate mit spread")
+
+
+```
+
+
+
+
+### dplyr::summarise
+
+  das gleiche wie aggragate
+  
+  
+```{r}
+hyper_long %>% group_by(Zeit, g) %>%
+  summarise(Cholesterin=funny(Cholesterin)) %>%
+  spread(g, Cholesterin) %>% 
+  kable(caption="dplyr mit spread")
+```
+  
+
+# Meine Funktion 
+ 
+Summarise  Recast2 das gleiche wie oben
+
+```{r}
+Summarise(chol0+chol1+chol6+chol12~g, hyper, funny,
+        formula=variable~g) %>% 
+  kable(caption="Summarise mit formula")
+
+
+```
+
+
+  das gleiche wie oben nur mit spread
+
+```{r}
+
+Summarise(chol0+chol1+chol6+chol12~g, hyper, funny,
+        "Zeit", "Cholesterin") %>%
+  spread(g, Cholesterin) %>% 
+  kable(caption="Summarise mit spread")
+
+```
+
+und noch die margins
+```{r}
+Summarise(chol0+chol1+chol6+chol12~g, hyper,
+          funny,formula=variable~g, margins=TRUE) %>% 
+  kable(caption="Summarise mit margins")
+```
+
+
+
+```{r}
+
+Summarise(
+  chol0 + chol1 + chol6 + chol12 ~ g,
+  hyper, key="Zeit",  key.levels = c("Ausgangswert", "1 Monat", "6 Monate", "12 Monate"),
+  fun = function(x)
+    mean(x, na.rm = TRUE) 
+ 
+) %>%   kable(caption="Summarise mit eigener fun")
+
+
+```
+
+```{r}
+
+Summarise(
+  chol0 + chol1 + chol6 + chol12 ~ g,
+  hyper, key="Zeit", key.levels = c("Ausgangswert", "1 Monat", "6 Monate", "12 Monate"),
+  .n=function(x) length(na.omit(x)),
+  mean = function(x) mean(x, na.rm = TRUE),
+  sd = function(x)  sd(x, na.rm = TRUE),
+)  %>%   kable(caption="Summarise mit eigener fun")
+
+
+```
+
+
+
+## Aufdröseln vom Mehrfachantworten
+
+Die Funktion separate_multiple_choice() transformiert einen String mit Trennzeichen
+zu einem Multi-Set mit 0 und 1. (Separate multiple choice)
+der param x ist entweder ein Character oder eine zahl
+
+
+```{r}
+dat <-  data.frame(
+  Q1 = c(134, NA, 35, 134, 5, 24),
+  Q2 = c(
+    "Alm Dudler, Essig, Cola",  NA, 
+    "Cola, Holer", "Alm Dudler, Cola, 
+    Essig","Holer", "Bier, Essig"
+  )
+)
+dat
+
+
+cbind(dat[-1],
+      separate_multiple_choice(dat$Q2))
+
+
+dat <- cbind(dat[-2],
+             separate_multiple_choice(dat$Q1,
+                                      label = c(
+                                        "Alm Dudler", "Bier", "Cola", "Essig", "Holer"
+                                      )))
+
+names(dat) <- GetLabelOrName(dat)
+dat
+
+
+```
+

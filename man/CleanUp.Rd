@@ -117,6 +117,9 @@ data[2,2]<- NA
 str(data<-upData2(data, labels = c(g="Gruppe" , a="A", b="B") ))
 str(Drop_NA(data))
 
+ tidyr::drop_na(data)
+ 
+
 str(Drop_case(data, 1))
 
 #-  Aber das geht auch

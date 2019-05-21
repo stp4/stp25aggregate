@@ -12,6 +12,9 @@
 #' data[2,2]<- NA
 #' str(data<-upData2(data, labels = c(g="Gruppe" , a="A", b="B") ))
 #' str(Drop_NA(data))
+#' 
+#'  tidyr::drop_na(data)
+#'  
 Drop_NA <- function(data, ..., output = TRUE) {
   N_in <- nrow(data)
   if (missing(...)) {
