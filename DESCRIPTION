@@ -11,8 +11,15 @@ Depends:
     R (>= 3.2)
 Imports: stats, utils, Hmisc, magrittr, car, knitr
 Suggests:
-    haven, reshape2, testthat, stringr,
-    installr, Formula, dplyr, tidyr
+    haven,
+    reshape2,
+    testthat,
+    stringr,
+    installr,
+    Formula,
+    dplyr,
+    tidyr,
+    rmarkdown
 VignetteBuilder: knitr
 LazyData: TRUE
 RoxygenNote: 6.1.1

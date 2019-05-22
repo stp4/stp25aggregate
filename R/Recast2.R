@@ -184,6 +184,7 @@ Recast2 <- function(Formula,
 
 #' @rdname Recast2
 #' @export
+#' @description Summarise: ist eine Kopie bzw Erweiterung von Recast2
 Summarise <- function(x,
                       .data,
                       fun = NULL,

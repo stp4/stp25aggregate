@@ -7,7 +7,7 @@
 #' Umformen (reshape)
 #'
 #' Umformen von einem Breit-Format nach einem Lang-Format. Melt2 und melt2 sind
-#' Erweiterungen der reshape2::melt Funktion. Intern wird \code{melt} und \code{dcast} verwendet.
+#' Erweiterungen der reshape2::melt Funktion. Intern wird  melt und dcast verwendet.
 #' @param x Objekt kann Formel oder data.frame sein
 #' @param ... weitere Argument 
 #'
@@ -95,6 +95,63 @@ Long.list <- function(x,
 
 
 
+
+
+#' @rdname Long
+#' @description 
+#' Transformiert von Long nach Wide
+#' Quelle: https://community.rstudio.com/t/spread-with-multiple-value-columns/5378
+#'
+#' WArnung: die Funktion ist experimental
+#' @export
+#'
+#' @examples
+#'   suppressPackageStartupMessages(library(tidyverse))
+#' 
+#' df <- data.frame(month=rep(1:3,2),
+#'                  student=rep(c("Amy", "Bob"), each=3),
+#'                  A=c(9, 7, 6, 8, 6, 9),
+#'                  B=c(6, 7, 8, 5, 6, 7))
+#' df %>% Wide(student, c(A, B))
+#' 
+#' df[-4] %>% tidyr::spread(student, A)
+#' df[-4] %>% Wide2(student, A)
+#' 
+#' 
+#' df_widw %>% Long( Amy_A, Amy_B, Bob_A, Bob_B, by=~month)
+#' Long(list( A=c("Amy_A", "Bob_A"), B=c( "Amy_B", "Bob_B")),
+#'      df_widw,
+#'      by=~month,
+#'      key = "student",
+#'      key.level=c("Amy", "Bob")
+#'      )
+#'  
+#'  t1 <- df %>%
+#'  tidyr::gather(variable, value, -(month:student)) %>%
+#'    tidyr::unite(temp, student, variable) %>%
+#'     tidyr::spread(temp, value)
+
+Wide <- function(.data, key, value) {
+  if (!dplyr::is.tbl(.data)) tibble::as_tibble(.data)
+  
+  # quote key
+  keyq <- rlang::enquo(key)
+  # break value vector into quotes
+  valueq <- rlang::enquo(value)
+  
+  # test length value
+  if( length(rlang::quo_get_expr(valueq)) ==1){
+    .data %>% tidyr::spread(!!keyq, !!valueq)
+  }else{
+    s <- rlang::quos(!!valueq)
+    .data %>% tidyr::gather(variable, value, !!!s) %>%
+      tidyr::unite(temp, !!keyq, variable) %>%
+      tidyr::spread(temp, value)
+  }
+}
+
+
+
 #' @rdname Long
 #' @return Dataframe in Langfor
 #' @export
@@ -133,7 +190,7 @@ Melt2.formula <-   function(x,
                             id.vars = X$group.vars,
                             ...) {
  
-  cat("\n***Melt2.formula***\n")
+ 
   
   molten <- reshape2::melt(X$data, id.vars, ...)
   
@@ -166,7 +223,7 @@ Melt2.formula <-   function(x,
 Melt2.data.frame <- function(x,
                              ...,
                              key = "variable", value = "value") {
-  #cat("\n***Melt2.data.frame***\n")
+ 
   molten <- suppressWarnings(reshape2::melt(x, ...))
 
   vars <- which(names(x) %in% unique(molten$variable))
@@ -184,7 +241,7 @@ Melt2.data.frame <- function(x,
 #' @description Melt2.default gibt alles ausser die data.frames und Formeln an reshape2::melt weiter.
 Melt2.default <- function(data, ...,
                           key = "variable", value = "value") {
-  #cat("\n***Melt2.default***\n")
+ 
   reshape2::melt(data, ...)
 }
 
@@ -203,7 +260,7 @@ melt2 <-
            ...,
            by = NULL,
            key = "variable", value = "value") {
-  #  cat("\n***melt2***\n")
+  
     measure <-
       sapply(lazyeval::lazy_dots(...), function(x) {
         as.character(x[1])
