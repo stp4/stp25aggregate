@@ -34,7 +34,7 @@ Long.data.frame <- function(.data, ..., id.vars = NULL) {
   if (is.null(id.vars))
     molten <- melt2(.data, ...)
   else
-    molten <- Melt2.data.frame(.data, ...)
+    molten <- Melt2.data.frame(.data, id.vars=id.vars, ...)
   
   if (is_tbl) tibble::as_tibble(molten)
   else molten
@@ -115,7 +115,7 @@ Long.list <- function(x,
 #' df %>% Wide(student, c(A, B))
 #' 
 #' df[-4] %>% tidyr::spread(student, A)
-#' df[-4] %>% Wide2(student, A)
+#' df[-4] %>% Wide(student, A)
 #' 
 #' 
 #' df_widw %>% Long( Amy_A, Amy_B, Bob_A, Bob_B, by=~month)
@@ -132,7 +132,11 @@ Long.list <- function(x,
 #'     tidyr::spread(temp, value)
 
 Wide <- function(.data, key, value) {
-  if (!dplyr::is.tbl(.data)) tibble::as_tibble(.data)
+  
+ # if (!dplyr::is.tbl(.data))
+  #  .data <- tibble::as_tibble(.data)
+    
+   
   
   # quote key
   keyq <- rlang::enquo(key)
@@ -140,13 +144,17 @@ Wide <- function(.data, key, value) {
   valueq <- rlang::enquo(value)
   
   # test length value
-  if( length(rlang::quo_get_expr(valueq)) ==1){
-    .data %>% tidyr::spread(!!keyq, !!valueq)
-  }else{
+  if (length(rlang::quo_get_expr(valueq)) == 1) {
+    tidyr::spread(.data, !!keyq, !!valueq)
+  } else{
     s <- rlang::quos(!!valueq)
-    .data %>% tidyr::gather(variable, value, !!!s) %>%
-      tidyr::unite(temp, !!keyq, variable) %>%
-      tidyr::spread(temp, value)
+    
+    tidyr::spread(
+      tidyr::unite(
+        tidyr::gather(.data, variable, value, !!!s),
+      temp, !!keyq, variable),
+    temp, value
+    )
   }
 }
 

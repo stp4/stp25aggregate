@@ -47,6 +47,8 @@ reshape objek
 Erweiterung der recast-Funktion. Erwartet einen data.frame
 mit \code{label} und verwendet die \code{melt} und \code{dcast}  Funftionen
 vom Packet library(reshape2).
+
+Summarise: ist eine Kopie bzw Erweiterung von Recast2
 }
 \examples{
 

@@ -90,6 +90,8 @@ head(hyper_long <- Long(hyper2, key = "time", value = "chol"))
 
 
 ### Liste
+Bei listen ist die Reihenfolge entscheidend also "chol0", "chol1", "chol6", "chol12" gibt ein anderes Ergebniss als
+"chol0", "chol12", "chol1", "chol6"
 
 ```{r}
 
@@ -100,13 +102,26 @@ hyper_long <- Long(
     rrd = c("rrd0" , "rrd1", "rrd6", "rrd12")
   ),
   hyper,
-  by =  ~ g,
+  by =  ~ nr+g,
   key = "Zeit",
   key.levels = c("Ausgangswert", "1 Monat", "6 Monate", "12 Monate")
 )
 
  rbind( hyper_long[1:5,], dplyr::sample_n(hyper_long,5 ))
 ```
+
+
+
+### und zurück
+
+```{r}
+
+hyper_long %>% Wide(Zeit, c(chol, rrs, rrd))
+
+```
+
+
+
 
 
 ## Tranformieren apply mit formula
