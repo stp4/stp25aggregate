@@ -230,13 +230,14 @@ Melt2.formula <-   function(x,
 #'
 Melt2.data.frame <- function(x,
                              ...,
-                             key = "variable", value = "value") {
+                             key = "variable", 
+                             value = "value") {
  
   molten <- suppressWarnings(reshape2::melt(x, ...))
-
+  
   vars <- which(names(x) %in% unique(molten$variable))
   measuer_vars <- GetLabelOrName(x[vars])
-
+  
   molten$variable <-
     factor(molten$variable, names(measuer_vars), measuer_vars)
   n <- length(molten)
@@ -248,7 +249,8 @@ Melt2.data.frame <- function(x,
 #' @rdname Long
 #' @description Melt2.default gibt alles ausser die data.frames und Formeln an reshape2::melt weiter.
 Melt2.default <- function(data, ...,
-                          key = "variable", value = "value") {
+                          key = "variable", 
+                          value = "value") {
  
   reshape2::melt(data, ...)
 }
@@ -267,7 +269,8 @@ melt2 <-
   function(x,
            ...,
            by = NULL,
-           key = "variable", value = "value") {
+           key = "variable", 
+           value = "value") {
   
     measure <-
       sapply(lazyeval::lazy_dots(...), function(x) {
@@ -278,16 +281,12 @@ melt2 <-
     if (length(meAsNum) != 0)
       measure[meAsNum] <- names(x[as.numeric(measure[meAsNum])])
 
-    
     if (is_formula2(by))
       by <- all.vars(by)
     
     if(length(measure)==0){
-      
       if( is.null(by)) measure<- names(x)
       else  measure <- setdiff(names(x), by)
-        
-
     }
 
     molten <- reshape2::melt (

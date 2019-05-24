@@ -171,7 +171,7 @@ Recast2 <- function(Formula,
                                 labels = group_labels)
   } else {
     print("Recast2: Keine Ahnung wie ich hier her komme??")
-    print("Eventuell: wegen margins? dann  fun=variable~ ")
+    print("Eventuell: wegen margins? dann  fun = variable ~ ")
     result <- NULL
   }
 

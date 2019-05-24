@@ -93,7 +93,7 @@ df <- data.frame(month=rep(1:3,2),
 df \%>\% Wide(student, c(A, B))
 
 df[-4] \%>\% tidyr::spread(student, A)
-df[-4] \%>\% Wide2(student, A)
+df[-4] \%>\% Wide(student, A)
 
 
 df_widw \%>\% Long( Amy_A, Amy_B, Bob_A, Bob_B, by=~month)
