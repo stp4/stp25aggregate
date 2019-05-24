@@ -1,5 +1,6 @@
 # stp25aggregate - Data and Variable Transformation Functions 
 
+Warnung die Funktionen hier sind experimentell!
 
 Long/Wide
 ---------
