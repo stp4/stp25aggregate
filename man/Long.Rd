@@ -27,8 +27,8 @@ Wide(.data, key, value)
 Melt2(x, ...)
 
 \method{Melt2}{formula}(x, data, key = "variable", value = "value",
-  subset, na.action = na.pass, X = stp25formula::prepare_data2(x, data,
-  subset, na.action), id.vars = X$group.vars, ...)
+  na.action = na.pass, X = stp25formula::prepare_data2(x, data,
+  na.action = na.action), id.vars = X$group.vars, ...)
 
 \method{Melt2}{data.frame}(x, ..., key = "variable", value = "value")
 
@@ -52,8 +52,6 @@ melt2(x, ..., by = NULL, key = "variable", value = "value")
 \item{key.levels}{wenn value gesetzt wird dann 1:nlevels}
 
 \item{data}{Daten}
-
-\item{subset}{nicht verwendbar}
 
 \item{na.action}{auch nicht zu veraendern}
 

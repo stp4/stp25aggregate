@@ -7,8 +7,6 @@
 \alias{CleanUp.default}
 \alias{CleanUp_factor}
 \alias{Label}
-\alias{SetLabels}
-\alias{DeletLabels}
 \alias{label_data_frame}
 \alias{Drop_NA}
 \alias{Drop_case}
@@ -30,11 +28,7 @@ CleanUp_factor(data, ...)
 
 Label(data, ...)
 
-SetLabels(x, ...)
-
-DeletLabels(data)
-
-label_data_frame(data, labels = NULL)
+label_data_frame(x, labels)
 
 Drop_NA(data, ..., output = TRUE)
 
@@ -65,8 +59,6 @@ Select_case(data, ..., output = TRUE)
 
 \item{variable.names}{Variable Namen}
 
-\item{labels}{Labels}
-
 \item{subset}{Ausgewählte Fälle Position als Zahl}
 }
 \description{
@@ -83,7 +75,7 @@ Labels die bei den Tabellen
 verwendet werden. Im Unterschied zu \code{UpData2()} arbeitet diese Funktion mit
   (...) argument.
 
-DeletLabels:  Loeschen des Attributs label
+Intern wenn mit get_label nur die Kopie wiederhergestellt wird
 
 \code{Drop_NA} entfernt Fälle mit NAs mit \code{dplyr::filter(data, ...)} wenn \code{...} leer ist ann alle also quasi na.omit
 

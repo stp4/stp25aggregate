@@ -6,16 +6,16 @@
 \title{Summarise Data}
 \usage{
 Recast2(Formula, data, fun = NULL, key = "variable", value = "value",
-  subset, na.action = na.pass, X = stp25formula::Formula_Data(Formula,
-  data, subset, na.action), id.vars = X$xname, measure.var,
+  na.action = na.pass, X = stp25formula::Formula_Data(Formula, data,
+  na.action = na.action), id.vars = X$xname, measure.var,
   formula = NULL, labels = TRUE, margins = FALSE,
   margins_name = "gesamt", ...)
 
 Summarise(x, .data, fun = NULL, key = "variable", value = "value",
-  subset, na.action = na.pass, X = stp25formula::Formula_Data(x, .data,
-  subset, na.action), id.vars = X$xname, measure.var, formula = NULL,
-  labels = TRUE, margins = FALSE, margins_name = "gesamt",
-  key.levels = NULL, ...)
+  na.action = na.pass, X = stp25formula::Formula_Data(x, .data,
+  na.action = na.action), id.vars = X$xname, measure.var,
+  formula = NULL, labels = TRUE, margins = FALSE,
+  margins_name = "gesamt", key.levels = NULL, ...)
 }
 \arguments{
 \item{Formula}{Formula-Objekt}
@@ -26,7 +26,7 @@ Summarise(x, .data, fun = NULL, key = "variable", value = "value",
 
 \item{key, value}{Names of new key and value columns, as strings}
 
-\item{subset, na.action}{fuer Formula na.action = na.omit, na.pass, na.exclude, na.fail}
+\item{na.action}{fuer Formula na.action = na.omit, na.pass, na.exclude, na.fail}
 
 \item{X}{Formula-Objekt}
 

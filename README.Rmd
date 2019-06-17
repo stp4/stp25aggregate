@@ -1,0 +1,128 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+require(stpvers)
+```
+# stp25aggregate
+
+Data and Variable Transformation Functions 
+
+
+Long/Wide
+---------
+
+Umformen von einem Breit-Format nach einem Lang-Format. Melt2 und melt2
+sind Erweiterungen der reshape2::melt Funktion. Intern wird *melt* und
+*dcast* verwendet.
+```{r}
+df <- tibble::tibble(
+   month=c(1,2,3,1,2,3),
+   student= gl(2,3, labels =c("Amy", "Bob")),
+   A=c(9,7,6,8,6,9),
+   B=c(6,7,8,5,6,7)
+)
+
+```
+ 
+
+### Vergleich der Ergebnisse spread vs Wide
+
+```{r}
+    tidyr::spread(df[-4], student, A)
+    (df_w1 <- Wide(df[-4], student, A))
+```
+
+
+
+
+
+### Vergleich der Ergebnisse gather vs Long
+
+```{r}
+     tidyr::gather(df_w1,  key = "student", value = "A", Amy, Bob)
+     Long(Amy + Bob ~ month, df_w1, key="student", value="A")
+     Long(df_w1, id.vars=1, key = "student", value = "A") 
+```
+     
+
+ 
+
+### Long mit meheren Parametern
+
+```{r}
+    (df_w2 <- Wide(df, student, c(A, B)))
+     Long(list(A=c("Amy_A", "Bob_A" ), B=c("Amy_B", "Bob_B")), df_w2,
+                 by =  ~ month,
+                 key = "student",
+                 key.levels= c("Amy", "Bob"))
+
+
+```
+
+
+
+### Berechnen
+
+```{r}
+mean3<- function(x)round(mean(x, na.rm=TRUE), 1)
+
+    Summarise(A + B ~ student, df, mean3, key = "group", value = "cbc")
+    Summarise(A + B ~ student, df, mean3,  margins = TRUE)
+    Summarise(A + B ~ student,
+                      df,
+                      mean3,
+                      formula = variable ~ student,
+                      margins = TRUE)
+```
+
+
+
+### Aufdröseln vom Mehrfachantworten
+
+Die Funktion separate_multiple_choice() transformiert einen String mit
+Trennzeichen zu einem Multi-Set mit 0 und 1. (Separate multiple choice)
+der param x ist entweder ein Character oder eine zahl
+```{r}
+    dat <-  data.frame(
+      Q1 = c(134, NA, 35, 134, 5, 24),
+      Q2 = c(
+        "Alm Dudler, Essig, Cola",  NA, 
+        "Cola, Holer", "Alm Dudler, Cola, 
+        Essig","Holer", "Bier, Essig"
+      )
+    )
+    dat
+```
+
+
+```{r}
+
+    cbind(dat[-1],
+          separate_multiple_choice(dat$Q2))
+```
+
+
+
+
+```{r}
+    dat <- cbind(dat[-2],
+                 separate_multiple_choice(dat$Q1,
+                                          label = c(
+                                            "Alm Dudler", "Bier", "Cola", "Essig", "Holer"
+                                          )))
+
+dat
+```
+
+
+ 
+ 

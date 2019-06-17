@@ -101,7 +101,27 @@ beta=c(1.1, 2.4, 4.1, 0))
 
 #summary(dat1)
 #m1 <- lm(y ~ x1 + x2, data=dat1)
+
+
+
+
 #' 
-#' 
-#' 
+#' #Exporting data is handled with one function, export():
+
+library("rio")
+
+export(mtcars, "mtcars.csv") # comma-separated values
+export(mtcars, "mtcars.rds") # R serialized
+export(mtcars, "mtcars.sav") # SPSS
+#A particularly useful feature of rio is the ability to import from and export to #compressed (e.g., zip) directories, saving users the extra step of compressing a large #exported file, e.g.:
+
+export(mtcars, "mtcars.tsv.zip")
+#As of rio v0.5.0, export() can also write multiple data farmes to respective sheets of #an Excel workbook or an HTML file:
+
+export(list(mtcars = mtcars, iris = iris), file = "mtcars.xlsx")
+
+
+x <- import("mtcars.csv")
+y <- import("mtcars.rds")
+z <- import("mtcars.sav")
 }
