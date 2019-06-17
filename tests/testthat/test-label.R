@@ -21,3 +21,32 @@ test_that("Label and GetLabelOrName works", {
     )
   )
 })
+
+
+
+
+test_that("Label tibbel-data.frame", {
+  dat1 <- data.frame(
+    sex = factor(c(1, 2, 1, 2, 1), 1:3, c("m", "f", "t")),
+    treatment = c("A", "A", "B", "B", "A"),
+    m = c(1, NA, 2, 1, 1)
+  )
+  
+  dat2 <-
+    tibble::tibble(
+      sex = factor(c(1, 2, 1, 2, 1), 1:3, c("m", "f", "t")),
+      treatment = c("A", "A", "B", "B", "A"),
+      m = c(1, NA, 2, 1, 1)
+    )
+  expect_equal(get_label(dat1),
+               get_label(dat2))
+  
+  
+  expect_equal(get_label(Label(dat1, sex = "Gechlecht", dumm = "Hallo")),
+               get_label(Label(dat2, sex = "Gechlecht", dumm = "Hallo")))
+  
+  
+})
+
+
+
