@@ -1,4 +1,63 @@
-#
+
+
+
+
+
+
+
+#' Subsetting Vectors, Matrices and Data Frames
+#'
+#' @param x object to be subsetted.
+#' @param subset logical expression indicating elements or rows to keep: missing values are taken as false.
+#' @param select expression, indicating columns to select from a data frame.
+#' @param drop passed on to [ indexing operator.
+#' @param ... further arguments to be passed to or from other methods.
+#'
+#' @return data.frame
+#' @export
+#'
+#' @examples
+#' 
+#' 
+#'  dat <- data.frame(
+#' sex = factor(c(1,2,1,2,1),1:3,c("m","f","t")),  treatment = c("A", "A", "B", "B", "A"),
+#' m1 = c(1, NA, 2, 1,1),  m2 = 1:5,  m3 = 1:5,  m4 = 1:5,  m5 = 1:5,  m6 = 1:5
+#' )
+#' dat <- Label(dat, sex="Geschlecht",
+#'                              treatment="Behandlung",
+#'                              m1="Cohlesterin", m2="Billirubin")
+#' 
+#' dat<-tibble::as_tibble(dat)
+#' subset(dat, treatment=="A")
+#' 
+#' 
+subset2<-
+  function (x, subset, select, drop = FALSE, ...) 
+  {
+    lbl<- get_label(x)
+    r <- if (missing(subset)) 
+      rep_len(TRUE, nrow(x))
+    else {
+      e <- substitute(subset)
+      r <- eval(e, x, parent.frame())
+      if (!is.logical(r)) 
+        stop("'subset' must be logical")
+      r & !is.na(r)
+    }
+    vars <- if (missing(select)) 
+      TRUE
+    else {
+      nl <- as.list(seq_along(x))
+      names(nl) <- names(x)
+      eval(substitute(select), nl, parent.frame())
+    }
+ 
+    x<- x[r, vars, drop = drop]
+    
+    label_data_frame(x, lbl)
+  }
+
+
 #' @rdname CleanUp
 #' @description  \code{Drop_NA} entfernt Fälle mit NAs mit \code{dplyr::filter(data, ...)} wenn \code{...} leer ist ann alle also quasi na.omit
 #' @export
@@ -31,7 +90,7 @@ Drop_NA <- function(data, ..., output = TRUE) {
     output_droped_n(N_in, nrow(dataF), txt)
   
   label_data_frame(dataF,
-                   GetLabelOrName(data))
+                   get_label(data))
 }
 
 
@@ -70,7 +129,7 @@ Drop_case <- function(data,
   else if (is.numeric(subset)) {
     N_in <- nrow(data)
     data <-  label_data_frame(data[-subset,],
-                              GetLabelOrName(data))
+                              get_label(data))
     if (output)
       output_droped_n(N_in, nrow(data))
     data
@@ -89,7 +148,7 @@ Drop_case <- function(data,
 #'
 Select_case <- function(data, ..., output = TRUE) {
   N_in <- nrow(data)
-  data <- label_data_frame(subset(data, ...), GetLabelOrName(data))
+  data <- label_data_frame(subset(data, ...), get_label(data))
   if (output)
     output_droped_n(N_in, nrow(data))
   data
