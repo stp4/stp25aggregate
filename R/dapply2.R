@@ -25,11 +25,11 @@ dapply2 <- function (.data,
                      ...) {
   if (inherits(.data, "tbl_df"))
     label_data_frame(dplyr::tbl_df(plyr::llply(.data, fun, ...)),
-                     GetLabelOrName(.data))
+                     get_label(.data))
   else
     label_data_frame(data.frame(plyr::llply(.data, fun, ...),
                                 stringsAsFactors=stringsAsFactors),
-                     GetLabelOrName(.data))
+                     get_label(.data))
 }
 
 

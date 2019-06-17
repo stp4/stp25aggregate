@@ -130,7 +130,7 @@ CleanUp.default  <- function (data = NA,
   else {
     names(mylabels) <- names(data)
     #class(label(data))
-    data <- label_data_frame(data, labels = mylabels)
+    data <- set_label(data, labels = mylabels)
     
   }
   
@@ -212,7 +212,7 @@ CleanUp.default  <- function (data = NA,
 #   else {
 #     names(mylabels) <- names(data)
 #     #class(label(data))
-#     data <- label_data_frame(data, labels = mylabels)
+#     data <- set_label(data, labels = mylabels)
 # 
 #   }
 # 

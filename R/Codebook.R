@@ -5,7 +5,7 @@
 #' @description Die Funltion \code{Codebook()} Extrahier die Daten-Struktur
 #' @export
 Codebook<- function(data){
-  lbs <- GetLabelOrName(data)
+  lbs <- get_label(data)
   lvl<- sapply(data,
                function(x) {
                  if(is.factor(x)){

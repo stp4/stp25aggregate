@@ -176,7 +176,6 @@ Melt2 <- function(x, ...) {
 
 #' @param key Bezeichnung der Bezeichner-Variable default ist "variable"
 #' @param value Bezeichnung der Werte-Variable default ist "value"
-#' @param subset nicht verwendbar
 #' @param na.action auch nicht zu veraendern
 #' @param X Formula-Objekt nicht ändern
 #' @param id.vars  nur bei Methode data.frame zu verwenden sonst ist hier nichts zu veraendern
@@ -189,20 +188,15 @@ Melt2.formula <-   function(x,
                             data,
                             key = "variable",
                             value = "value",
-                            subset,
                             na.action =  na.pass,
-                            X = stp25formula::prepare_data2(x,
-                                                        data,
-                                                        subset,
-                                                        na.action),
+                            X = stp25formula::prepare_data2(x, data,  na.action = na.action),
                             id.vars = X$group.vars,
                             ...) {
- 
- 
   
+   # message("In Melt2.formula" )
   molten <- reshape2::melt(X$data, id.vars, ...)
-  
-  value_labels <- GetLabelOrName(X$data[X$measure.vars])
+
+  value_labels <- X$row_name
   molten$variable <-
     factor(molten$variable, names(value_labels), value_labels)
 
@@ -236,7 +230,7 @@ Melt2.data.frame <- function(x,
   molten <- suppressWarnings(reshape2::melt(x, ...))
   
   vars <- which(names(x) %in% unique(molten$variable))
-  measuer_vars <- GetLabelOrName(x[vars])
+  measuer_vars <- get_label(x[vars])
   
   molten$variable <-
     factor(molten$variable, names(measuer_vars), measuer_vars)
@@ -295,7 +289,7 @@ melt2 <-
       measure.vars = measure,
       factorsAsStrings = FALSE
     )
-    measureLev <- GetLabelOrName(x[measure])
+    measureLev <- get_label(x[measure])
     molten$variable <- factor(molten$variable, names(measureLev), measureLev)
     n <- length(molten)
     names(molten)[c(n - 1, n)] <- c(key, value)

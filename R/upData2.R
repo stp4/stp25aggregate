@@ -67,7 +67,7 @@ is_tbl <- dplyr::is.tbl(data)
     data <- cleanup_factor_levels_encoding(data, from, to)
     data <- cleanup_typ_character_encoding(data, from, to)
     if (is.null(labels))
-      labels <- iconv(GetLabelOrName(data), from , to)
+      labels <- iconv(get_label(data), from , to)
   }
 
   #-- fehler Abfanagen
@@ -96,7 +96,7 @@ is_tbl <- dplyr::is.tbl(data)
         lbl <- Wertelabels[[i]]
         # löschen von Leerzellen also A;;C;D = zweiter level NA
 lbl[which(lbl =="") ] <- NA
-print(lbl)
+#print(lbl)
         lng <- length(lbl)
 
         #  nur wenn mehr als ein eintrag
@@ -158,12 +158,12 @@ print(lbl)
     labels <- as.character(data_dict[, names_data_dict[2]])
     names(labels) <- as.character(data_dict[, names_data_dict[1]])
     labels <- NAs_rm(labels)
-    data <- label_data_frame(data, labels)}
+    data <- set_label(data, labels)}
   }
 
   #-- Labels ohne Code_Book ---------------------------
   if (!is.null(labels))
-    data <- label_data_frame(data, labels)
+    data <- set_label(data, labels)
 
   if (is_tbl) tibble::as_tibble(data)
   else data

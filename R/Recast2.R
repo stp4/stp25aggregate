@@ -7,7 +7,7 @@
 #' @param data   Daten
 #' @param fun Agregat Funktion
 #' @param key,value Names of new key and value columns, as strings
-#' @param subset,na.action  fuer Formula na.action = na.omit, na.pass, na.exclude, na.fail
+#' @param na.action  fuer Formula na.action = na.omit, na.pass, na.exclude, na.fail
 #' @param formula  zum vertauchen von Spalten Argument an dcast
 #' @param labels sollen Hmisc levels verwendet werden
 #' @param margins Gesamtwert bei TRUE eigene Funktion sonst dcast
@@ -61,12 +61,10 @@ Recast2 <- function(Formula,
                     data,
                     fun = NULL,
                     key = "variable", value = "value",
-                    subset,
+               
                     na.action = na.pass,
-                    X = stp25formula::Formula_Data(Formula, 
-                                                   data, 
-                                                   subset, 
-                                                   na.action),
+                    X = stp25formula::Formula_Data(Formula, data, 
+                                                   na.action=na.action),
                     id.vars = X$xname,
                     measure.var,
                     formula = NULL,
@@ -111,8 +109,8 @@ Recast2 <- function(Formula,
   molten <-
     suppressWarnings(reshape2::melt(data, id.vars, measure.var))
   if (labels) {
-    value_labels <- GetLabelOrName(X$Y_data)
-    group_labels <- GetLabelOrName(X$X_data)
+    value_labels <- get_label(X$Y_data)
+    group_labels <- get_label(X$X_data)
     # --  wegen doppelter Labels
     value_labels2 <-
       if (length(unique(value_labels)) != length(value_labels))
@@ -126,7 +124,7 @@ Recast2 <- function(Formula,
   if (default_formula & (isFALSE(margins))) {
     result <-  reshape2::dcast(molten, formula, fun, ...)
     if (labels & (!is.null(group_labels)))
-       result <-   label_data_frame(result, labels = group_labels)
+       result <-   set_label(result, labels = group_labels)
 
   } else if (default_formula &  isTRUE(margins)) {
     #- Workaraound  fuer margins weil die nicht das gewuensche Ergebniss liefern
@@ -142,7 +140,7 @@ Recast2 <- function(Formula,
         data2 <- data
 
     margins2 <- Recast2(Formula = formula_margins, data = data2,
-                        fun = fun, subset = subset,
+                        fun = fun, 
                         na.action = na.action, labels = labels,
                         margins = FALSE)
 
@@ -157,8 +155,7 @@ Recast2 <- function(Formula,
 
     result <- rbind(res1, margins2)
     if (labels & (!is.null(group_labels)))
-          result <- label_data_frame(result,
-                                 labels = group_labels)
+          result <- set_label(result, group_labels)
   } else if (!default_formula) {
      if (is.null(X$X_data))
            data <- X$Y_data
@@ -167,8 +164,7 @@ Recast2 <- function(Formula,
                               margins = margins, ...)
 
     if (labels & (!is.null(group_labels)))
-       result <- label_data_frame(result,
-                                labels = group_labels)
+       result <- set_label(result, group_labels)
   } else {
     print("Recast2: Keine Ahnung wie ich hier her komme??")
     print("Eventuell: wegen margins? dann  fun = variable ~ ")
@@ -190,9 +186,9 @@ Summarise <- function(x,
                       fun = NULL,
                       key = "variable",
                       value = "value",
-                      subset,
+                    #  subset,
                       na.action = na.pass,
-                      X = stp25formula::Formula_Data(x, .data, subset, na.action),
+                      X = stp25formula::Formula_Data(x, .data, na.action= na.action),
                       id.vars = X$xname,
                       measure.var,
                       formula = NULL,
@@ -205,7 +201,7 @@ funny <- list(...)
   
   if (length(funny) == 0) {
     res<-  Recast2(
-      x,.data,fun, key, value,subset,
+      x,.data,fun, key, value,
       na.action,X,id.vars,
       measure.var,formula,
       labels, margins,
@@ -216,7 +212,7 @@ funny <- list(...)
     res <-
       Recast2(
         x,  .data,  fun = funny[[1]],
-        key,  value = names(funny)[1],  subset,
+        key,  value = names(funny)[1],  
         na.action,  X,  id.vars,
         measure.var,  formula = NULL,  labels,
         margins = FALSE,  margins_name
@@ -227,7 +223,8 @@ funny <- list(...)
       for (i in names(funny)[-1]) {
         next_res <- Recast2(
           x, .data,   fun = funny[[i]],
-          key, value = i, subset, na.action, X, id.vars, measure.var, formula = NULL,
+          key, value = i, 
+          na.action, X, id.vars, measure.var, formula = NULL,
           labels, margins = FALSE,
           margins_name
         )

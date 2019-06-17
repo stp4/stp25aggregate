@@ -78,9 +78,29 @@
 #' 
 #' #summary(dat1)
 #' #m1 <- lm(y ~ x1 + x2, data=dat1)
+#' 
+#' 
+#' 
+#' 
 #' #' 
-#' #' 
-#' #' 
+#' #' #Exporting data is handled with one function, export():
+#' 
+#' library("rio")
+#' 
+#' export(mtcars, "mtcars.csv") # comma-separated values
+#' export(mtcars, "mtcars.rds") # R serialized
+#' export(mtcars, "mtcars.sav") # SPSS
+#' #A particularly useful feature of rio is the ability to import from and export to #compressed (e.g., zip) directories, saving users the extra step of compressing a large #exported file, e.g.:
+#' 
+#' export(mtcars, "mtcars.tsv.zip")
+#' #As of rio v0.5.0, export() can also write multiple data farmes to respective sheets of #an Excel workbook or an HTML file:
+#' 
+#' export(list(mtcars = mtcars, iris = iris), file = "mtcars.xlsx")
+#' 
+#' 
+#' x <- import("mtcars.csv")
+#' y <- import("mtcars.rds")
+#' z <- import("mtcars.sav")
 
 GetData <- function (File = NA,
             na.strings = NULL,
@@ -98,27 +118,7 @@ GetData <- function (File = NA,
             ...)
             {
 
-    iconv.data.frame <-
-              function(df, from = "UTF8", to = "latin1", ...) {
-                df.names <- iconv(names(df), from, to)
-                df.rownames <- iconv(rownames(df), from, to)
-               # df.label <- iconv(Hmisc::label(df), from , to)
 
-                names(df) <- df.names
-                rownames(df) <- df.rownames
-                df.list <- lapply(df, function(x) {
-                  if (any(class(x) == "factor")) {
-                    levels(x)  <- iconv(levels(x), from , to)
-                    x
-                  } else if (any(class(x) == "character")) {
-                    x <- iconv(x, from , to)
-                  } else{
-                    x
-                  }
-                })
-                #   , labels=     df.label
-                Hmisc::upData(data.frame(df.list))
-              }
 
 
     LimeSurvy <- function(myfiles,
@@ -151,7 +151,7 @@ GetData <- function (File = NA,
                                   })
 
 
-                label_data_frame(data.frame(df.list),
+                set_label(data.frame(df.list),
                                  labels = df.label)
               }
     cleanup_NA <-
@@ -319,6 +319,8 @@ GetData <- function (File = NA,
             }# --if else file exist
             else {
               note <- paste(note,"Kein File mit namen: ", File, "vorhanden") 
+              stp25output::Text(note)
+              return(data.frame(NULL))
         }
       } #Elsw sonstige Files
 
@@ -341,3 +343,28 @@ GetData <- function (File = NA,
          }
       myData
 }
+
+
+
+
+# iconv.data.frame <-
+#   function(df, from = "UTF8", to = "latin1", ...) {
+#     df.names <- iconv(names(df), from, to)
+#     df.rownames <- iconv(rownames(df), from, to)
+#     # df.label <- iconv(Hmisc::label(df), from , to)
+#     
+#     names(df) <- df.names
+#     rownames(df) <- df.rownames
+#     df.list <- lapply(df, function(x) {
+#       if (any(class(x) == "factor")) {
+#         levels(x)  <- iconv(levels(x), from , to)
+#         x
+#       } else if (any(class(x) == "character")) {
+#         x <- iconv(x, from , to)
+#       } else{
+#         x
+#       }
+#     })
+#     #   , labels=     df.label
+#     Hmisc::upData(data.frame(df.list))
+#   }
