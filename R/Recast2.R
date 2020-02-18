@@ -9,7 +9,7 @@
 #' @param key,value Names of new key and value columns, as strings
 #' @param na.action  fuer Formula na.action = na.omit, na.pass, na.exclude, na.fail
 #' @param formula  zum vertauchen von Spalten Argument an dcast
-#' @param labels sollen Hmisc levels verwendet werden
+#' @param labels sollen levels verwendet werden
 #' @param margins Gesamtwert bei TRUE eigene Funktion sonst dcast
 #' @param measure.var Name der Gemessenen Variable
 #' @param X Formula-Objekt
@@ -69,7 +69,7 @@ Recast2 <- function(Formula,
                     measure.var,
                     formula = NULL,
                     labels = TRUE,
-                    ### wegen der Reihenfolge any(Hmisc::label(X$Y_data)!=""),
+                    ### wegen der Reihenfolge any(label(X$Y_data)!=""),
                     margins = FALSE,
                     # bei variablename weitergabe an dcast sonst droeel
                     margins_name = "gesamt",
