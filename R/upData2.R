@@ -50,8 +50,8 @@ upData2 <- function(data,
                     factor_sep = ";",
                     names_data_dict = c("names",  "labels",  "levels"),
                     ...) {
-is_tbl <- dplyr::is.tbl(data)
-
+  is_tbl <- dplyr::is.tbl(data)
+  
   data <- data.frame(data)
   NAs_rm <-  function(x) {
     leere_char <- which(x == "")
@@ -59,7 +59,6 @@ is_tbl <- dplyr::is.tbl(data)
       x[-leere_char]
     else
       x
-
   }
   #-- Putzen ----------------------------------------------
   if (reencode) {
@@ -69,16 +68,26 @@ is_tbl <- dplyr::is.tbl(data)
     if (is.null(labels))
       labels <- iconv(get_label(data), from , to)
   }
-
+  
   #-- fehler Abfanagen
   if (is.matrix(labels) | is.data.frame(labels)) {
-    data_dict <- labels
-    labels <- NULL
+    if (ncol(labels) == 2) {
+      nms <- as.character(labels[, 1])
+      labels <- as.character(labels[, 2])
+      names(labels) <- nms
+      
+    } else{
+      data_dict <- labels
+      labels <- NULL
+    }
   }
-
-  if (!is.null(data_dict)) {
-    #print(labels)
-
+  
+  
+  
+  #-- Labels ohne Code_Book ---------------------------
+  if (!is.null(labels))
+    data <- set_label(data, labels)
+  else if (!is.null(data_dict)) {
     #--  Factor-Levels ------------------------------------
     if (any(colnames(data_dict) %in% names_data_dict[3])) {
       Wertelabels <- as.character(data_dict[, names_data_dict[3]])
@@ -86,19 +95,20 @@ is_tbl <- dplyr::is.tbl(data)
       #leerzeichen
       Wertelabels <-  sapply(Wertelabels, function(x)
         gsub("(^[[:space:]]+|[[:space:]]+$)", "", x))
-      names(Wertelabels) <- as.character(data_dict[, names_data_dict[1]])
-
-  valid_names <-base::intersect(names(data),  names(Wertelabels))
-
-  Wertelabels<- Wertelabels[valid_names]
-
+      names(Wertelabels) <-
+        as.character(data_dict[, names_data_dict[1]])
+      
+      valid_names <- base::intersect(names(data),  names(Wertelabels))
+      
+      Wertelabels <- Wertelabels[valid_names]
+      
       for (i in names(Wertelabels)) {
         lbl <- Wertelabels[[i]]
         # löschen von Leerzellen also A;;C;D = zweiter level NA
-lbl[which(lbl =="") ] <- NA
-#print(lbl)
+        lbl[which(lbl == "")] <- NA
+        #print(lbl)
         lng <- length(lbl)
-
+        
         #  nur wenn mehr als ein eintrag
         if (lng > 1) {
           if (is.numeric(data[, i])) {
@@ -110,63 +120,68 @@ lbl[which(lbl =="") ] <- NA
               factor(data[, i], 1:lng, lbl)
           }
           else if (is.factor(data[, i])) {
-          #  data[, i] <- as.numeric(data[, i])
+            #  data[, i] <- as.numeric(data[, i])
             old_lvl <- levels(data[, i])
             # neu und alt gleiche elemente also eine andere Reihenvolge
             # alt a, b, c
             # neu b, c, a
-            if(setequal(old_lvl, lbl)){
-             # Text("UpData:", names(data[i]), " Change Levels from: ",
-             #      paste(old_lvl, collapse="; "),
-             #      " to: ",paste(lbl, collapse="; ") )
-              data[, i] <- factor(data[, i], lbl)}
-            else if (length(old_lvl) == length(lbl)){
-              Text("UpData:", names(data[i]), "Levels from: ",
-                   paste(old_lvl, collapse="; "),
-                   " to: ",paste(lbl, collapse="; ") )
-              data[, i] <- factor(data[, i], old_lvl, lbl)}
-            else warnings( "Updata2 mit DataDict neu und alt Levalels sind nicht  gleiche lang!")
-
+            if (setequal(old_lvl, lbl)) {
+              # Text("UpData:", names(data[i]), " Change Levels from: ",
+              #      paste(old_lvl, collapse="; "),
+              #      " to: ",paste(lbl, collapse="; ") )
+              data[, i] <- factor(data[, i], lbl)
+            }
+            else if (length(old_lvl) == length(lbl)) {
+              Text(
+                "UpData:",
+                names(data[i]),
+                "Levels from: ",
+                paste(old_lvl, collapse = "; "),
+                " to: ",
+                paste(lbl, collapse = "; ")
+              )
+              data[, i] <- factor(data[, i], old_lvl, lbl)
+            }
+            else
+              warnings("Updata2 mit DataDict neu und alt Levalels sind nicht  gleiche lang!")
+            
           } else if (is.character(data[, i])) {
             data[, i] <-
               factor(data[, i], lbl)
-
+            
           }
-
+          
           else{
             NULL
           }
         }
-
-        else if (lng==1 & lbl == "factor") {
+        
+        else if (lng == 1 & lbl == "factor") {
           data[, i] <- factor(data[, i])
         }
-        else if(lng==1 & lbl=="numeric"){
+        else if (lng == 1 & lbl == "numeric") {
           cat("\nin numeric", class(data[, i]), "\n")
-          if(!is.numeric(data[, i]))
-          data[, i] <- as.numeric( data[, i])
+          if (!is.numeric(data[, i]))
+            data[, i] <- as.numeric(data[, i])
         } else{
           NULL
         }
       }
     }
     #-- Name Beschriftung  Wertelabels
-
+    
     #-- Labels --------------------------------------------
-
-    if (any(colnames(data_dict) %in% names_data_dict[2])){
-    labels <- as.character(data_dict[, names_data_dict[2]])
-    names(labels) <- as.character(data_dict[, names_data_dict[1]])
-    labels <- NAs_rm(labels)
-    data <- set_label(data, labels)}
+    
+    if (any(colnames(data_dict) %in% names_data_dict[2])) {
+      labels <- as.character(data_dict[, names_data_dict[2]])
+      names(labels) <- as.character(data_dict[, names_data_dict[1]])
+      labels <- NAs_rm(labels)
+      data <- set_label(data, labels)
+    }
   }
-
-  #-- Labels ohne Code_Book ---------------------------
-  if (!is.null(labels))
-    data <- set_label(data, labels)
-
-  if (is_tbl) tibble::as_tibble(data)
-  else data
+  
+  if (is_tbl)
+    tibble::as_tibble(data)
+  else
+    data
 }
-
-
