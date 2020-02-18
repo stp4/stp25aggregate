@@ -2,7 +2,7 @@
 #' @rdname GetData
 #' @title Daten Importieren
 #' @description Ladet verschiedene Dateiformate von csv bis sav.  Tabellen im Text-Format koennen direkt gelesen werden.
-#' Zurueckgegeben wird ein Hmisc data.frame mit Levels und Labels siehe \link{upData}.
+#' Zurueckgegeben wird ein   data.frame mit Levels und Labels siehe \link{upData}.
 #' \subsection{CSV-Files}{Liest CSV-Files siehe \link{read.csv}   uebergeben werden Trennzeichen, Komma, usw.
 #'   }
 #' \subsection{Text direkt im R-File}{
@@ -129,11 +129,9 @@ GetData <- function (File = NA,
                 df.names   <- iconv(names(data), from, to)
                 df.rownames <- iconv(rownames(data), from, to)
                 df.label   <-
-                  iconv(attributes(data)$variable.labels, from, to)      ##   iconv(Hmisc::label(df),  from , to )
-                #    sapply( strsplit(  gsub("[\n\t//[]", "", df_label), "]") ,function(x)  x[1])
-
-
-
+                  iconv(attributes(data)$variable.labels, from, to)      
+           
+                
                 names(df.label) <- df.names
                 names(data) <- df.names
                 rownames(data) <- df.rownames
@@ -347,24 +345,4 @@ GetData <- function (File = NA,
 
 
 
-# iconv.data.frame <-
-#   function(df, from = "UTF8", to = "latin1", ...) {
-#     df.names <- iconv(names(df), from, to)
-#     df.rownames <- iconv(rownames(df), from, to)
-#     # df.label <- iconv(Hmisc::label(df), from , to)
-#     
-#     names(df) <- df.names
-#     rownames(df) <- df.rownames
-#     df.list <- lapply(df, function(x) {
-#       if (any(class(x) == "factor")) {
-#         levels(x)  <- iconv(levels(x), from , to)
-#         x
-#       } else if (any(class(x) == "character")) {
-#         x <- iconv(x, from , to)
-#       } else{
-#         x
-#       }
-#     })
-#     #   , labels=     df.label
-#     Hmisc::upData(data.frame(df.list))
-#   }
+ 
