@@ -1,9 +1,12 @@
 ---
 output: github_document
 ---
-
+<!--  -->
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-
+<!-- title: Aggregate -->
+<!-- author: Wolfgang Peter -->
+<!-- output: -->
+<!--   pdf_document -->
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -13,6 +16,53 @@ knitr::opts_chunk$set(
 require(stpvers)
 ```
 # stp25aggregate
+
+
+
+## Daten Laden
+
+
+GetData(): Ladet verschiedene Dateiformate von csv bis sav. Tabellen im Text-Format koennen direkt gelesen werden. Zurueckgegeben wird ein data.frame.
+
+```{r}
+dat<-GetData("
+sex treatment control
+m  2 3
+f  3 4
+",
+Tabel_Expand = TRUE, id.vars = 1)
+head(dat)
+#xtabs(~sex +value, dat)
+
+```
+
+Andere Packete für SPSS und XLSX
+
+
+```
+  library("readxl")
+  
+  DF <- read_excel("Raw data/MIH Fragenkatalog.xlsx")
+
+
+```
+
+
+```{r}
+
+library("rio")
+# Excel (.xls and .xlsx), using haven::read_excel.
+# SPSS (.sav), using haven::read_sav 
+```
+
+
+
+
+
+
+
+
+
 
 Data and Variable Transformation Functions 
 
@@ -30,7 +80,7 @@ df <- tibble::tibble(
    A=c(9,7,6,8,6,9),
    B=c(6,7,8,5,6,7)
 )
-
+df
 ```
  
 
@@ -38,6 +88,13 @@ df <- tibble::tibble(
 
 ```{r}
     tidyr::spread(df[-4], student, A)
+
+# new style with pivot_wider
+df[-4] %>%
+  tidyr::pivot_wider(names_from = student, 
+                     values_from = A, 
+                     names_prefix = "Student_")
+
     (df_w1 <- Wide(df[-4], student, A))
 ```
 
@@ -53,13 +110,26 @@ df <- tibble::tibble(
      Long(df_w1, id.vars=1, key = "student", value = "A") 
 ```
      
+```{r}
+
+df[-4] %>%
+  tidyr::pivot_wider(names_from = student, 
+                     values_from = A, 
+                     names_prefix = "Student_") %>%
+  knitr::kable()# %>%
+  #kableExtra::kable_styling()
+
+
+
+```
 
  
 
 ### Long mit meheren Parametern
 
 ```{r}
-    (df_w2 <- Wide(df, student, c(A, B)))
+    (df_w2 <- Wide(df, student, c(A, B))) 
+# # new style with pivot_longer
      Long(list(A=c("Amy_A", "Bob_A" ), B=c("Amy_B", "Bob_B")), df_w2,
                  by =  ~ month,
                  key = "student",
@@ -124,5 +194,139 @@ dat
 ```
 
 
+## Mittelwerte Addieren
+
+
+```{r}
+
+
+#' Mittelwerte Addieren
+#'
+#' 
+#' @param n 
+#' @param m 
+#' @param sd 
+#'
+calc.mean <- function(n, m, sd) {
+  j <- length(n) #-- Anzahl an Elementen
+  if (length(n) != length(m) |
+      length(n) != length(sd))
+    stop("Ungleiche Anzahl an n,m oder sd!")
+  
+  #print(paste( m ,"-", trunc(m),"=", m - trunc(m)))
+  #-- Interne Function berechnet zwei Werte
+  calc.mean2 <- function(n, m, sd) {
+    var <- sd ^ 2
+    n.total <- sum(n)
+    n.minus1 <- n - 1
+    m.total <- sum(m * n) / n.total
+    var.total <-
+      1 / (n.total - 1) * (sum(n.minus1 * var)  +   prod(n) / n.total * diff(m) ^
+                             2)
+    #var3 =  1/(n1+n2-1) *( (n1-1)*var1  +  (n2-1)*var2 + n1*n2/(n1+n2)*((m1-m2)^2)  )
+    data.frame(
+      n = c(n, n.total),
+      m = c(m, m.total),
+      sd = c(sd, sqrt(var.total)),
+      var = c(var, var.total)
+    )
+  }
+  
+  if (j == 2) {
+    zw <- calc.mean2(n, m, sd)
+  }
+  else{
+    n1 <- n[1:2]
+    m1 <- m[1:2]
+    sd1 <- sd[1:2]
+    zw <- calc.mean2(n = n1, m = m1, sd = sd1)
+    zw.j <- zw[3, ]
+    for (i in 3:j) {
+      zw.i <- calc.mean2(
+        n  = c(zw.j$n, n[i])
+        ,
+        m  = c(zw.j$m, m[i])
+        ,
+        sd = c(zw.j$sd , sd[i])
+      )
+      zw[i, ] <- zw.i[2, ]
+      zw <- rbind(zw, zw.i[3, ])
+    }
+    zw
+  }
+  cbind(value = c(1:j, "total") , zw)
+}
+
+
+
+x1 <- rnorm( 4, 3.0,  2.1)    
+x2 <- rnorm(10, 4.0,  2.0) 
+x3 <- rnorm(11, 3.5,  3.0)
+
+calc.mean(
+  n = c(length(x1), length(x2)),
+  m = c(mean(x1), mean(x2)),
+  sd = c(sd(x1), sd(x2))
+)
+mean(c(x1, x2))
+sd(c(x1, x2))
+var(c(x1, x2))
+
+
+calc.mean(
+  n = c(length(x1), length(x2), length(x3)),
+  m = c(mean(x1), mean(x2), mean(x3)),
+  sd = c(sd(x1), sd(x2) , sd(x3))
+)
+mean(c(x1, x2, x3))
+sd(c(x1, x2, x3))
+var(c(x1, x2, x3))
+
+
+
+# Total Asf
+calc.mean(
+  n = c(22, 26, 22, 26),
+  m = c(407, 613, 434, 565) / 100,
+  sd = c(258, 236, 345, 253) / 100
+)
+
+
+             
+```
+
  
- 
+
+
+
+
+## Funktionen aus anderen Packeten
+
+### dplyr::case_when
+
+```{r}
+
+library(dplyr)
+
+set.seed(0815)
+n<-15
+df<- data.frame(x=rnorm(n), y=rnorm(n), z=rnorm(n))
+df <- df %>%
+  mutate(group = case_when(x<0 & y<0 & z<0 ~ "A",  
+                           x<0 | y<0 | z<0 ~ "B",  
+                           TRUE ~ "C"  
+                           ))
+                           
+df  
+```
+
+
+
+
+
+
+
+## Berechnungen mit tydy
+
+
+

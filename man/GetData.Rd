@@ -43,7 +43,7 @@ oder ein String in Textformat dierekt im R-File.}
 }
 \description{
 Ladet verschiedene Dateiformate von csv bis sav.  Tabellen im Text-Format koennen direkt gelesen werden.
-Zurueckgegeben wird ein Hmisc data.frame mit Levels und Labels siehe \link{upData}.
+Zurueckgegeben wird ein   data.frame mit Levels und Labels siehe \link{upData}.
 \subsection{CSV-Files}{Liest CSV-Files siehe \link{read.csv}   uebergeben werden Trennzeichen, Komma, usw.
   }
 \subsection{Text direkt im R-File}{

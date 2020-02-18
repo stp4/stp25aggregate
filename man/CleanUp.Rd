@@ -45,17 +45,17 @@ Select_case(data, ..., output = TRUE)
 
 \item{to}{encoding to latine1}
 
-\item{uselabels}{Labels}
+\item{uselabels}{Labels labels   FALSE}
 
 \item{na.strings}{Fehlende Werte}
 
-\item{force.numeric}{alles zu Zahlen}
+\item{force.numeric}{alles zu Zahlen alles zu Zahlen konvertieren}
 
-\item{encoding}{Stichwort sonderzeichen}
+\item{encoding}{Stichwort sonderzeichen  "UTF-8"}
 
-\item{sep}{Trennzeichen}
+\item{sep}{Trennzeichen variable.labels   noch nicht getestet  attributes(data)$variable.labels,}
 
-\item{variable.labels}{Variable Labels}
+\item{variable.labels}{Variable Labels  Import von LimeSurvy}
 
 \item{variable.names}{Variable Namen}
 

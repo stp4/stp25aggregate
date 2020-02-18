@@ -34,7 +34,7 @@ Summarise(x, .data, fun = NULL, key = "variable", value = "value",
 
 \item{formula}{zum vertauchen von Spalten Argument an dcast}
 
-\item{labels}{sollen Hmisc levels verwendet werden}
+\item{labels}{sollen levels verwendet werden}
 
 \item{margins}{Gesamtwert bei TRUE eigene Funktion sonst dcast}
 
