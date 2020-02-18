@@ -115,8 +115,8 @@ GetLabelOrName <- function(x,
     return(NULL)
   } else {
     xnames  <- names(x)
-    # xlabel <- if( Hmisc_label) Hmisc::label(x) else xnames
-    xlabel <-  get_label(x) # Hmisc::label(x)
+ 
+    xlabel <-  get_label(x)  
     df_names <- if (is.null(pattern)) xnames
     else gsub(" $", "", gsub(pattern, replacement, xnames), 
               perl = TRUE)
