@@ -16,8 +16,19 @@
 #' @author Wolfgang Peter
 #' @export
 #' @examples
-#'
-#'
+#' 
+#' df <- tibble::tibble(
+#'   month=c(1,2,3,1,2,3),
+#'   student= gl(2,3, labels =c("Amy", "Bob")),
+#'   A=c(9,7,6,8,6,9),
+#'   B=c(6,7,8,5,6,7)
+#' )
+#' 
+#' df <- Label(df, month="Monat")
+#' str(dapply2(df, as.numeric))
+#' 
+#' strpurrr::(map_dfr(df, as.numeric))
+#' 
 dapply2 <- function (.data,
                      fun = function(x)
                        as.numeric(x),
