@@ -9,6 +9,16 @@ transform2<- function(.data, ...){
   label_data_frame(transform(.data, ...), get_label(.data))
 }
 
+
+
+#' @rdname transform2
+#' @export
+
+mutate2<- function(.data, ...){
+  label_data_frame(dplyr::mutate(.data, ...), get_label(.data))
+}
+
+
 #' @rdname transform2
 #' @description \code{separate_multiple_choice()} Aufdröseln vom Mehrfachantworten, die Funktion transformiert einen String mit Trennzeichen
 #' zu einem Multi-Set mit 0 und 1. (Separate multiple choice)
