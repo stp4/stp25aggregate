@@ -1,7 +1,23 @@
 
+<!--  -->
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+<!-- title: Aggregate -->
+
+<!-- author: Wolfgang Peter -->
+
+<!-- output: -->
+
+<!--   pdf_document -->
+
 # stp25aggregate
+
+Generate Random Data Sets
+
+Generates random data sets including: data.frames, lists, and vectors.
+Readme(<https://www.rdocumentation.org/packages/wakefield/versions/0.3.3>)\]
+wakefield
 
 ## Daten Laden
 
@@ -26,7 +42,7 @@ Tabel_Expand = TRUE, id.vars = 1)
 #>    character 
 #> 
 #> read.text2
-#> Mon Jan 27 06:27:56 2020
+#> Sun May 03 07:36:41 2020
 head(dat)
 #>   sex     value
 #> 1   m treatment
@@ -450,15 +466,15 @@ calc.mean(
   sd = c(sd(x1), sd(x2))
 )
 #>   value  n        m       sd      var
-#> 1     1  4 3.163574 2.323758 5.399853
-#> 2     2 10 3.923093 2.054760 4.222040
-#> 3 total 14 3.706088 2.072644 4.295855
+#> 1     1  4 1.133962 2.922614 8.541674
+#> 2     2 10 3.519869 2.217147 4.915741
+#> 3 total 14 2.838181 2.573999 6.625471
 mean(c(x1, x2))
-#> [1] 3.706088
+#> [1] 2.838181
 sd(c(x1, x2))
-#> [1] 2.072644
+#> [1] 2.573999
 var(c(x1, x2))
-#> [1] 4.295855
+#> [1] 6.625471
 
 
 calc.mean(
@@ -466,17 +482,17 @@ calc.mean(
   m = c(mean(x1), mean(x2), mean(x3)),
   sd = c(sd(x1), sd(x2) , sd(x3))
 )
-#>    value  n        m       sd      var
-#> 1      1  4 3.163574 2.323758 5.399853
-#> 2      2 10 3.923093 2.054760 4.222040
-#> 3      3 11 1.394997 2.753909 7.584013
-#> 31 total 25 2.689208 2.618744 6.857820
+#>    value  n        m       sd       var
+#> 1      1  4 1.133962 2.922614  8.541674
+#> 2      2 10 3.519869 2.217147  4.915741
+#> 3      3 11 4.450399 3.383463 11.447822
+#> 31 total 25 3.547557 3.004307  9.025863
 mean(c(x1, x2, x3))
-#> [1] 2.689208
+#> [1] 3.547557
 sd(c(x1, x2, x3))
-#> [1] 2.618744
+#> [1] 3.004307
 var(c(x1, x2, x3))
-#> [1] 6.85782
+#> [1] 9.025863
 
 
 

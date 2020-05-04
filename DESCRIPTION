@@ -2,8 +2,8 @@ Package: stp25aggregate
 Type: Package
 Encoding: UTF-8
 Title: Aggregieren von Daten
-Version: 0.2.5
-Date: 2019-06-17
+Version: 0.2.6
+Date: 202005-04
 Authors@R: person("Wolfgang", "Peter", email = "w.peter@statistik-peter.at",  role = c("aut", "cre"))
 Description: SCollection of convenient functions for common data aggregations.
 License: GPL-3

@@ -5,6 +5,9 @@
 #' Zurueckgegeben wird ein   data.frame mit Levels und Labels siehe \link{upData}.
 #' \subsection{CSV-Files}{Liest CSV-Files siehe \link{read.csv}   uebergeben werden Trennzeichen, Komma, usw.
 #'   }
+#' \subsection{xls}{
+#' Verwendet readxl::read_excel
+#'   }
 #' \subsection{Text direkt im R-File}{
 #'  Es lassen sich direkt Daten als Text einlesen dabei kann mit \code{Tabel_Expand = TRUE, id.vars = 1:2} gesteuert
 #'  werden ob eine Kreuztabelle aufgedroeselt werden soll.
@@ -16,7 +19,7 @@
 #' machen lange Text-Variablen im SPSS-File, die sollten im Falle geloescht werden. Weitere
 #' Info unter  \link{spss.get} und \link{read.spss}.
 #' Neu ist das  die Default-Option   spss.get() is  um mit haven zu Arbeitenist als Parameter  \code{type=2}
-#' zu ?bergeben. Bei hven werden zus?tzlich die Faktoren bereinigt.
+#' zu ?bergeben. Bei haven werden zusetzlich die Faktoren bereinigt.
 #'   }
 #' \subsection{LimeSurvy}{
 #'  Hier muss eine Liste uebergeben werden die die Filenamen beinhaltet 
@@ -28,7 +31,7 @@
 #'  Hier erfolgt das Einlesen einfach ueber \code{load(File, ...)}, besser ist es daher direkt den Befehl zu verwenden.
 #'  }
 #'
-#' @param File Demo.xla, 
+#' @param path Demo.xla, 
 #' Demo.sav, 
 #' Demo.csv  - ist ein Pfad zu einem csv, xls, sav oder Rdata Datensatz 
 #' oder ein String in Textformat dierekt im R-File.
@@ -38,9 +41,8 @@
 #' @param id.vars nur mit Tabel_Expand  - Nummer und Name der ID-Variablen bei Tabel_Expand default ist 1.
 #' @param value nur mit Tabel_Expand  - Name der output-variable bei Tabel_Expand.
 #' @param Data_info  Data_info = date(),
-#' @param sep Lesen der csv- Files = ";",
-#' @param quote Lesen der csv- Files = "\"",
-#' @param dec  Lesen der csv- Files = ".",
+#' @param sep,quote,dec Lesen der csv- Files = ";", = "\"", ".",
+#' @param sheet,skip,range an readxl::read_excel
 #' @param reencode  UTF-8 = FALSE,
 #' @param user_na	If TRUE variables with user defined missing will be read into labelled_spss objects. If FALSE, the default, user-defined missings will be converted to NA.
 #' @param output Text Info zu File
@@ -102,7 +104,7 @@
 #' y <- import("mtcars.rds")
 #' z <- import("mtcars.sav")
 
-GetData <- function (File = NA,
+GetData <- function (path = NA,
             na.strings = NULL,
             force.numeric = FALSE,
             Tabel_Expand = FALSE,
@@ -115,231 +117,260 @@ GetData <- function (File = NA,
             user_na=FALSE,
             reencode = FALSE,
             output=TRUE,
+            sheet = 1, 
+            range = NULL, 
+            skip = 0, 
             ...)
             {
 
-
-
-
-    LimeSurvy <- function(myfiles,
-                                    from = "UTF8",
-                                    to = "latin1",
-                                    ...) {
-                source(myfiles[[1]], echo = TRUE)
-                df.names   <- iconv(names(data), from, to)
-                df.rownames <- iconv(rownames(data), from, to)
-                df.label   <-
-                  iconv(attributes(data)$variable.labels, from, to)      
-           
-                
-                names(df.label) <- df.names
-                names(data) <- df.names
-                rownames(data) <- df.rownames
-                df.list <- lapply(data
-                                  , function(x) {
-                                    if (any(class(x) == "factor")) {
-                                      levels(x)  <- iconv(levels(x), from, to)
-                                      x
-                                    } else if (any(class(x) == "character")) {
-                                      iconv(x, from, to)
-
-                                    } else{
-                                      x
-                                    }
-                                  })
-
-
-                set_label(data.frame(df.list),
-                                 labels = df.label)
-              }
-    cleanup_NA <-
-                function(obj,
-                         na.strings = NULL,
-                         force.numeric = TRUE) {
-                  dimobj <- dim(obj)
-                  for (i in 1:dimobj[2]) {
-                    x <- obj[[i]]
-                    if (!is.null(na.strings)) {
-                      x[x %in% na.strings] <- NA
-                      modif <- TRUE
-                    }
-                    if (force.numeric && length(lev <- levels(x))) {
-                      x <- factor(x)
-                      if (all.is.numeric(levels(x))) {
-                        x <- as.numeric(as.character(x))
-                        modif <- TRUE
-                      }
-                    }
-                    if (modif)
-                      obj[[i]] <- x
-                    NULL
-                  }
-                  obj
-                }
-
-
-    read.text2 <-
-                function (Lines,
-                          na.strings = c("NA", "na"),
-                          sep = "\t",
-                          dec = ".",
-                          stringsAsFactors=TRUE) {
-                  cleanup <- function(x) {
-                    gsub(sep, " ", x)
-                  }
-                  myData <- read.table(
-                    zz <- textConnection(cleanup(Lines)),
-                    header = TRUE,
-                    dec = dec,
-                    na.strings = na.strings,
-                    stringsAsFactors=stringsAsFactors
-                  )
-                  close(zz)
-                  myData
-                }
-
-    TabelToExpandDataFrame <- function(myData, id.vars, value = "value") {
-      
-
-      
-                expand.dft <-
-                  function(x,
-                           na.strings = "NA",
-                           as.is = FALSE,
-                           dec = ".") {
-                    #-- http://wiki.stdout.org/rcookbook/Manipulating%20data/Converting%20between%20data%20frames%20and%20contingency%20tables/
-                    # Take each row in the source data frame table and replicate it
-                    # using the Freq value
-                    myData <- sapply(1:nrow(x),
-                                 function(i)
-                                   x[rep(i, each = x$Freq[i]),],
-                                 simplify = FALSE)
-
-                    # Take the above list and rbind it to create a single myData
-                    # Also subset the result to eliminate the Freq column
-                    myData <- subset(do.call("rbind", myData), select = -Freq)
-
-                    # Now apply type.convert to the character coerced factor columns
-                    # to facilitate data type selection for each column
-                    for (i in 1:ncol(myData)) {
-                      myData[[i]] <-
-                        type.convert(
-                          as.character(myData[[i]]),
-                          na.strings = na.strings,
-                          as.is = as.is,
-                          dec = dec
-                        )
-                    }
-                    myData
-                  }
-                
-                
-                # library(reshape2)
-                if (!is.data.frame(myData))
-                  myData <-
-                    read.text2(myData)  # nur wenn die Funktion dierekt aufgerufen wird moeglich
-                if (!is.numeric(id.vars))
-                  id.vars <- which(names(myData) %in% id.vars)
-                myDataMatrix <- as.matrix(myData[,-id.vars])
-                if (length(id.vars) == 1) {
-                  dimnames(myDataMatrix)[[1]] <- myData[, 1]
-                  myData2 <-
-                    expand.dft(as.data.frame(as.table(myDataMatrix), stringsAsFactors = TRUE))
-                  colnames(myData2)[2] <- value
-                }
-                else {
-                  dimnames(myDataMatrix)[[1]] <- apply(myData[, id.vars], 1, paste,
-                                                   collapse = "+")
-                  myData2 <-
-                    expand.dft(as.data.frame(as.table(myDataMatrix), stringsAsFactors = TRUE))
-                  colnames(myData2)[2] <- value
-                  
-                  myData2 <-
-                    cbind(reshape2::colsplit(myData2[, 1], "\\+", names(myData)[id.vars]),  myData2)
-                }
-
-                myData2 <-
-                  as.data.frame(lapply(myData2, function(x)
-                    if (is.character(x))
-                      factor(x)
-                    else
-                      x))
-                if(length(id.vars)==1)  {
-                  names(myData2)[1] <-names(myData)[id.vars]
-                }
-              
-                
-                myData2
-              }
-
-    #-- Begin der Funktion -------------------------------------------------
-    myData <- data.frame(NULL)
-    file_info <- "Text "
-    note <- paste("\n\nFile: \n", File, " ", class(File))
-
-    # 15.11.2013 09:47:26
-    if (is.list(File)) {
-      note <- paste(note,"\n\nLimeSurvy\n")
-                myData <- LimeSurvy(File)
-    }
-    else if (length(grep("\n", File)) > 0) {
-      note <- paste(note,"\n\nread.text2\n")
-                myData <- read.text2(File, ...)
-    }
-    else {
-                # sonstige Datafiles
-          if (file.exists(File)) {
-                  file_info <- file.info(File)[c(1, 4, 5)]
-                  note <- paste(note,"\n\nfile_info\n")
-                  ext <- tolower(tools::file_ext(File))
-                  note <- paste(note,"\n\next\n")
-                  myData <- switch(
-                    ext,
-                    sav = CleanUp_factor(haven::read_sav(File, user_na = user_na)),
-                    por = CleanUp_factor(haven::read_por(File, user_na = user_na)),
-                    csv = read.csv(File,sep = sep,quote = quote,dec = dec,...),
-                    rdata = load(File, parent.frame(n = 1)),
-                    stop("Unknown extension '.", ext, "'", call. = FALSE)
-                  )
-
-                  if (reencode)
-                    myData <- cleanup_names_encoding(myData)
-                    Data_info <- paste0(
-                            rownames(file_info)[1],
-                            " (",file_info$size,
-                            "KB), ",  file_info$ctime,
-                            ", N=", nrow(myData),
-                            ", Var=", ncol(myData),
-                            ", Missing=", sum(is.na(myData))
-                  )
-
-                   
-            }# --if else file exist
-            else {
-              note <- paste(note,"Kein File mit namen: ", File, "vorhanden") 
-              stp25output::Text(note)
-              return(data.frame(NULL))
+  LimeSurvy <- function(path,
+                        from = "UTF8",
+                        to = "latin1",
+                        ...) {
+    source(path[[1]], echo = TRUE)
+    df.names   <- iconv(names(data), from, to)
+    df.rownames <- iconv(rownames(data), from, to)
+    df.label   <-
+      iconv(attributes(data)$variable.labels, from, to)
+    
+    
+    names(df.label) <- df.names
+    names(data) <- df.names
+    rownames(data) <- df.rownames
+    df.list <- lapply(data
+                      , function(x) {
+                        if (any(class(x) == "factor")) {
+                          levels(x)  <- iconv(levels(x), from, to)
+                          x
+                        } else if (any(class(x) == "character")) {
+                          iconv(x, from, to)
+                          
+                        } else{
+                          x
+                        }
+                      })
+    
+    
+    set_label(data.frame(df.list),
+              labels = df.label)
+  }
+  
+  cleanup_NA <-
+    function(obj,
+             na.strings = NULL,
+             force.numeric = TRUE) {
+      dimobj <- dim(obj)
+      for (i in 1:dimobj[2]) {
+        x <- obj[[i]]
+        if (!is.null(na.strings)) {
+          x[x %in% na.strings] <- NA
+          modif <- TRUE
         }
-      } #Elsw sonstige Files
-
-              #-- myData ist jetzt geladen
-      nam <- names(myData)
-              #-- doppelte .. entfernen
-      names(myData) <- gsub("\\.$", "", gsub("\\.+", ".", nam), perl = T)
-
-      if ((!is.null(na.strings)) | force.numeric) {
-                myData <- cleanup_NA(myData, na.strings, force.numeric)
-              }
-      if (Tabel_Expand) {
-                myData <-
-                  TabelToExpandDataFrame(myData, id.vars = id.vars, value = value, ...)
+        if (force.numeric && length(lev <- levels(x))) {
+          x <- factor(x)
+          if (all.is.numeric(levels(x))) {
+            x <- as.numeric(as.character(x))
+            modif <- TRUE
+          }
+        }
+        if (modif)
+          obj[[i]] <- x
+        NULL
       }
-      comment(myData) <- Data_info
-      if(output){ 
-        stp25output::Text(note)
-        stp25output::Text(Data_info)
-         }
+      obj
+    }
+
+  read.text2 <-
+    function (Lines,
+              na.strings = c("NA", "na"),
+              sep = "\t",
+              dec = ".",
+              stringsAsFactors = TRUE) {
+      cleanup <- function(x) {
+        gsub(sep, " ", x)
+      }
+      myData <- read.table(
+        zz <- textConnection(cleanup(Lines)),
+        header = TRUE,
+        dec = dec,
+        na.strings = na.strings,
+        stringsAsFactors = stringsAsFactors
+      )
+      close(zz)
       myData
+    }
+
+  TabelToExpandDataFrame <-
+    function(myData, id.vars, value = "value") {
+      expand.dft <-
+        function(x,
+                 na.strings = "NA",
+                 as.is = FALSE,
+                 dec = ".") {
+          #-- http://wiki.stdout.org/rcookbook/Manipulating%20data/Converting%20between%20data%20frames%20and%20contingency%20tables/
+          # Take each row in the source data frame table and replicate it using the Freq value
+          myData <- sapply(1:nrow(x),
+                           function(i)
+                             x[rep(i, each = x$Freq[i]), ],
+                           simplify = FALSE)
+          
+          # Take the above list and rbind it to create a single myData
+          # Also subset the result to eliminate the Freq column
+          myData <-
+            subset(do.call("rbind", myData), select = -Freq)
+          
+          # Now apply type.convert to the character coerced factor columns
+          # to facilitate data type selection for each column
+          for (i in 1:ncol(myData)) {
+            myData[[i]] <-
+              type.convert(
+                as.character(myData[[i]]),
+                na.strings = na.strings,
+                as.is = as.is,
+                dec = dec
+              )
+          }
+          myData
+        }
+
+      if (!is.data.frame(myData))
+        myData <-
+          read.text2(myData)  # nur wenn die Funktion dierekt aufgerufen wird moeglich
+      if (!is.numeric(id.vars))
+        id.vars <- which(names(myData) %in% id.vars)
+      myDataMatrix <- as.matrix(myData[, -id.vars])
+      if (length(id.vars) == 1) {
+        dimnames(myDataMatrix)[[1]] <- myData[, 1]
+        myData2 <-
+          expand.dft(as.data.frame(as.table(myDataMatrix), stringsAsFactors = TRUE))
+        colnames(myData2)[2] <- value
+      }
+      else {
+        dimnames(myDataMatrix)[[1]] <- apply(myData[, id.vars], 1, paste,
+                                             collapse = "+")
+        myData2 <-
+          expand.dft(as.data.frame(as.table(myDataMatrix), stringsAsFactors = TRUE))
+        colnames(myData2)[2] <- value
+        
+        myData2 <-
+          cbind(reshape2::colsplit(myData2[, 1], "\\+", names(myData)[id.vars]),  myData2)
+      }
+      
+      myData2 <-
+        as.data.frame(lapply(myData2, function(x)
+          if (is.character(x))
+            factor(x)
+          else
+            x))
+      if (length(id.vars) == 1)  {
+        names(myData2)[1] <- names(myData)[id.vars]
+      }
+      
+      myData2
+    }
+
+    
+  #-- Begin der Funktion -------------------------------------------------
+  myData <- data.frame(NULL)
+  file_info <- "Text "
+  note <- paste("\n\nFile: \n", path, " ", class(path))
+  
+  # 15.11.2013 09:47:26
+  if (is.list(path)) {
+    note <- paste(note, "\n\nLimeSurvy\n")
+    myData <- LimeSurvy(path)
+  }
+  else if (length(grep("\n", path)) > 0) {
+    note <- paste(note, "\n\nread.text2\n")
+    myData <- read.text2(path, ...)
+  }
+  else {
+    # sonstige Datafiles
+    if (file.exists(path)) {
+      file_info <- file.info(path)[c(1, 4, 5)]
+      note <- paste(note, "\n\nfile_info\n")
+      ext <- tolower(tools::file_ext(path))
+      note <- paste(note, "\n\next\n")
+      
+      myData <- switch(
+        ext,
+        sav = CleanUp_factor(haven::read_sav(
+          path, 
+          user_na = user_na)),
+        por = CleanUp_factor(haven::read_por(
+          path, 
+          user_na = user_na)),
+        xlsx = clean_names(
+          readxl::read_excel(
+            path,
+            sheet = sheet,
+            skip = skip,
+            range = range,
+            ...
+          )
+        ),
+        csv = clean_names(
+          read.csv(
+            File,
+            sep = sep,
+            skip = skip,
+            quote = quote,
+            dec = dec,
+            ...
+          )
+        ),
+        rdata = load(path, parent.frame(n = 1)),
+        stop("Unknown extension '.", ext, "'", call. = FALSE)
+      )
+      
+      if (reencode)
+        myData <- cleanup_names_encoding(myData)
+      
+      Data_info <- paste0(
+        rownames(file_info)[1],
+        " (",
+        file_info$size,
+        "KB), ",
+        file_info$ctime,
+        ", N=",
+        nrow(myData),
+        ", Var=",
+        ncol(myData),
+        ", Missing=",
+        sum(is.na(myData))
+      )
+      
+      
+    }# --if else file exist
+    else {
+      note <- paste(note, "Kein path mit namen: ", path, "vorhanden")
+      stp25output::Text(note)
+      return(data.frame(NULL))
+    }
+  } #Elsw sonstige Files
+  
+  #-- myData ist jetzt geladen
+  nam <- names(myData)
+  #-- doppelte .. entfernen
+  names(myData) <-
+    gsub("\\.$", "", gsub("\\.+", ".", nam), perl = T)
+  
+  if ((!is.null(na.strings)) | force.numeric) {
+    myData <- cleanup_NA(myData, na.strings, force.numeric)
+  }
+  if (Tabel_Expand) {
+    myData <-
+      TabelToExpandDataFrame(myData, id.vars = id.vars, value = value, ...)
+  }
+  
+  comment(myData) <- Data_info
+  
+  if (output) {
+    stp25output::Text(note)
+    stp25output::Text(Data_info)
+  }
+  
+  myData
 }
 
 
