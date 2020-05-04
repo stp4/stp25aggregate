@@ -4,8 +4,10 @@
 \alias{XLS}
 \title{Nummernindex aus Excel - Spaltenbezeichnung}
 \usage{
-XLS(..., myLetters = c(LETTERS, unlist(lapply(LETTERS, function(abc)
-  paste0(abc, LETTERS)))))
+XLS(
+  ...,
+  myLetters = c(LETTERS, unlist(lapply(LETTERS, function(abc) paste0(abc, LETTERS))))
+)
 }
 \arguments{
 \item{...}{liste mit den Spaltennamen A:BB}
@@ -17,7 +19,7 @@ Extrahiert aus Buchstaben die Spaltennummer
 }
 \examples{
 
-#strsplit("A:V", "\\\\:")
+#strsplit("A:V", "\\:")
 XLS(a, B)
 XLS(a, B, c:f, g:h,i, r:z)
 XLS(A:Z)

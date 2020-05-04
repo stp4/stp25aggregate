@@ -5,17 +5,40 @@
 \alias{Summarise}
 \title{Summarise Data}
 \usage{
-Recast2(Formula, data, fun = NULL, key = "variable", value = "value",
-  na.action = na.pass, X = stp25formula::Formula_Data(Formula, data,
-  na.action = na.action), id.vars = X$xname, measure.var,
-  formula = NULL, labels = TRUE, margins = FALSE,
-  margins_name = "gesamt", ...)
+Recast2(
+  Formula,
+  data,
+  fun = NULL,
+  key = "variable",
+  value = "value",
+  na.action = na.pass,
+  X = stp25formula::Formula_Data(Formula, data, na.action = na.action),
+  id.vars = X$xname,
+  measure.var,
+  formula = NULL,
+  labels = TRUE,
+  margins = FALSE,
+  margins_name = "gesamt",
+  ...
+)
 
-Summarise(x, .data, fun = NULL, key = "variable", value = "value",
-  na.action = na.pass, X = stp25formula::Formula_Data(x, .data,
-  na.action = na.action), id.vars = X$xname, measure.var,
-  formula = NULL, labels = TRUE, margins = FALSE,
-  margins_name = "gesamt", key.levels = NULL, ...)
+Summarise(
+  x,
+  .data,
+  fun = NULL,
+  key = "variable",
+  value = "value",
+  na.action = na.pass,
+  X = stp25formula::Formula_Data(x, .data, na.action = na.action),
+  id.vars = X$xname,
+  measure.var,
+  formula = NULL,
+  labels = TRUE,
+  margins = FALSE,
+  margins_name = "gesamt",
+  key.levels = NULL,
+  ...
+)
 }
 \arguments{
 \item{Formula}{Formula-Objekt}

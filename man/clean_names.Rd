@@ -2,11 +2,24 @@
 % Please edit documentation in R/clean_names.R
 \name{clean_names}
 \alias{clean_names}
+\alias{clean_names.data.frame}
+\alias{make_clean.default}
 \title{clean_names
 Quelle https://drdoane.com/clean-consistent-column-names/}
 \usage{
-clean_names(.data, tolower = FALSE, unique = TRUE,
-  abbreviate = FALSE, minlength = 4)
+clean_names(x, ...)
+
+\method{clean_names}{data.frame}(.data, label = TRUE, labels = NULL, ...)
+
+make_clean.default(
+  n,
+  tolower = TRUE,
+  unique = TRUE,
+  abbreviate = FALSE,
+  minlength = 4,
+ 
+    replace = c(`'` = "", `"` = "", `\%` = "_pct", `#` = "_cnt", Ã¤ = "ae", Ã¼ = "ue", Ã¶ = "oe", Ãœ = "Ue", Ã„ = "Ae", Ã– = "Oe", ÃŸ = "ss", `Â¨` = "", `&+` = "_and_", `@+` = "_at_", `_` = ".")
+)
 }
 \arguments{
 \item{.data}{data.frame oder character}
@@ -40,4 +53,26 @@ clean_names(
     "a + b", "a - b", "a * b", "Ã–sel"
   ), abbreviate=TRUE
 )
+
+#' Alternative mit janitor#'
+
+cbind(x=x,
+stp=stp25aggregate::clean_names(x),
+jan=janitor::make_clean_names(x, replace=
+                                c(
+                                  "'"="",
+                                  "\""="",
+                                  "\%"="_pct",
+                                  "#"="_cnt",
+                                  "\u00e4"= "ae",
+                                  "\u00fc"= "ue",
+                                  "\u00f6"= "oe",
+                                  "\u00dc"= "Ue",
+                                  "\u00c4"= "Ae",
+                                  "\u00d6"= "Oe",
+                                  "\u00df"= "ss"
+
+                                )
+))
+
 }

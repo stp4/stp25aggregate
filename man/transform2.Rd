@@ -2,14 +2,24 @@
 % Please edit documentation in R/transform2.R
 \name{transform2}
 \alias{transform2}
+\alias{mutate2}
 \alias{separate_multiple_choice}
 \title{transform2}
 \usage{
 transform2(.data, ...)
 
-separate_multiple_choice(x, sep = ", ", labels = c("ja", "nein"),
-  levels = 1:0, prafix = NULL, into = NULL, label = NULL,
-  na.strings = NULL)
+mutate2(.data, ...)
+
+separate_multiple_choice(
+  x,
+  sep = ", ",
+  labels = c("ja", "nein"),
+  levels = 1:0,
+  prafix = NULL,
+  into = NULL,
+  label = NULL,
+  na.strings = NULL
+)
 }
 \arguments{
 \item{.data}{Daten}

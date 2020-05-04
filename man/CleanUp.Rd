@@ -19,10 +19,17 @@ CleanUp(data, ...)
 
 cleanup_names_encoding(data, from = "UTF8", to = "latin1")
 
-\method{CleanUp}{default}(data = NA, uselabels = FALSE,
-  na.strings = NULL, force.numeric = FALSE, encoding = TRUE,
-  sep = ".", variable.labels = attributes(data)$variable.labels,
-  variable.names = names(data), ...)
+\method{CleanUp}{default}(
+  data = NA,
+  uselabels = FALSE,
+  na.strings = NULL,
+  force.numeric = FALSE,
+  encoding = TRUE,
+  sep = ".",
+  variable.labels = attributes(data)$variable.labels,
+  variable.names = names(data),
+  ...
+)
 
 CleanUp_factor(data, ...)
 

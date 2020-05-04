@@ -4,13 +4,28 @@
 \alias{GetData}
 \title{Daten Importieren}
 \usage{
-GetData(File = NA, na.strings = NULL, force.numeric = FALSE,
-  Tabel_Expand = FALSE, id.vars = 1, value = "value",
-  Data_info = date(), sep = ";", quote = "\\"", dec = ".",
-  user_na = FALSE, reencode = FALSE, output = TRUE, ...)
+GetData(
+  path = NA,
+  na.strings = NULL,
+  force.numeric = FALSE,
+  Tabel_Expand = FALSE,
+  id.vars = 1,
+  value = "value",
+  Data_info = date(),
+  sep = ";",
+  quote = "\\"",
+  dec = ".",
+  user_na = FALSE,
+  reencode = FALSE,
+  output = TRUE,
+  sheet = 1,
+  range = NULL,
+  skip = 0,
+  ...
+)
 }
 \arguments{
-\item{File}{Demo.xla, 
+\item{path}{Demo.xla, 
 Demo.sav, 
 Demo.csv  - ist ein Pfad zu einem csv, xls, sav oder Rdata Datensatz 
 oder ein String in Textformat dierekt im R-File.}
@@ -27,11 +42,7 @@ oder ein String in Textformat dierekt im R-File.}
 
 \item{Data_info}{Data_info = date(),}
 
-\item{sep}{Lesen der csv- Files = ";",}
-
-\item{quote}{Lesen der csv- Files = "\"",}
-
-\item{dec}{Lesen der csv- Files = ".",}
+\item{sep, quote, dec}{Lesen der csv- Files = ";", = "\"", ".",}
 
 \item{user_na}{If TRUE variables with user defined missing will be read into labelled_spss objects. If FALSE, the default, user-defined missings will be converted to NA.}
 
@@ -39,12 +50,17 @@ oder ein String in Textformat dierekt im R-File.}
 
 \item{output}{Text Info zu File}
 
+\item{sheet, skip, range}{an readxl::read_excel}
+
 \item{...}{Argumente fuer spss und csv. Bei SPSS-Files  kann die Zeichencodierung mit  \code{reencode ="UTF-8"} geaendert werden.}
 }
 \description{
 Ladet verschiedene Dateiformate von csv bis sav.  Tabellen im Text-Format koennen direkt gelesen werden.
 Zurueckgegeben wird ein   data.frame mit Levels und Labels siehe \link{upData}.
 \subsection{CSV-Files}{Liest CSV-Files siehe \link{read.csv}   uebergeben werden Trennzeichen, Komma, usw.
+  }
+\subsection{xls}{
+Verwendet readxl::read_excel
   }
 \subsection{Text direkt im R-File}{
  Es lassen sich direkt Daten als Text einlesen dabei kann mit \code{Tabel_Expand = TRUE, id.vars = 1:2} gesteuert
@@ -57,7 +73,7 @@ automatisch bereinigt dH sie werden durch die Number des Faktors ersaetzt. Probl
 machen lange Text-Variablen im SPSS-File, die sollten im Falle geloescht werden. Weitere
 Info unter  \link{spss.get} und \link{read.spss}.
 Neu ist das  die Default-Option   spss.get() is  um mit haven zu Arbeitenist als Parameter  \code{type=2}
-zu ?bergeben. Bei hven werden zus?tzlich die Faktoren bereinigt.
+zu ?bergeben. Bei haven werden zusetzlich die Faktoren bereinigt.
   }
 \subsection{LimeSurvy}{
  Hier muss eine Liste uebergeben werden die die Filenamen beinhaltet 

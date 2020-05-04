@@ -36,6 +36,6 @@ Extrahiert die Labels
 }
 \examples{
 
-# GetLabelOrName(data, pattern="störender string")
+# GetLabelOrName(data, pattern="stÃ¶render string")
 
 }

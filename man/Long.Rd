@@ -19,16 +19,22 @@ Long(x, ...)
 
 \method{Long}{data.frame}(.data, ..., id.vars = NULL)
 
-\method{Long}{list}(x, .data, by = NULL, key = NULL, value = NULL,
-  key.levels = NULL, ...)
+\method{Long}{list}(x, .data, by = NULL, key = NULL, value = NULL, key.levels = NULL, ...)
 
 Wide(.data, key, value)
 
 Melt2(x, ...)
 
-\method{Melt2}{formula}(x, data, key = "variable", value = "value",
-  na.action = na.pass, X = stp25formula::prepare_data2(x, data,
-  na.action = na.action), id.vars = X$group.vars, ...)
+\method{Melt2}{formula}(
+  x,
+  data,
+  key = "variable",
+  value = "value",
+  na.action = na.pass,
+  X = stp25formula::prepare_data2(x, data, na.action = na.action),
+  id.vars = X$group.vars,
+  ...
+)
 
 \method{Melt2}{data.frame}(x, ..., key = "variable", value = "value")
 
@@ -39,7 +45,7 @@ melt2(x, ..., by = NULL, key = "variable", value = "value")
 \arguments{
 \item{x}{Objekt kann Formel oder data.frame sein}
 
-\item{...}{weitere Argument}
+\item{...}{weitere Argumente an melt}
 
 \item{id.vars}{nur bei Methode data.frame zu verwenden sonst ist hier nichts zu veraendern}
 
@@ -56,8 +62,6 @@ melt2(x, ..., by = NULL, key = "variable", value = "value")
 \item{na.action}{auch nicht zu veraendern}
 
 \item{X}{Formula-Objekt nicht ändern}
-
-\item{...}{weitere Argumente an melt}
 }
 \value{
 data.frame
