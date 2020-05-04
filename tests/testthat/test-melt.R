@@ -46,33 +46,47 @@ expect_equal(tidyr::spread( df[-4],student, A),
 
 test_that("Long works", {
   
-  df <- data.frame(month=rep(1:3,2),
-                   student=rep(c("Amy", "Bob"), each=3),
-                   A=c(9, 7, 6, 8, 6, 9),
-                   B=c(6, 7, 8, 5, 6, 7))
- 
-df_w1 <- Wide(df[-4], student, A) 
-
-df_a1 <- Long(Amy + Bob ~ month, df_w1, key="student", value="A") 
-
-df_a2 <- Long(df_w1, id.vars=1, key = "student", value = "A")
-
-df_a <- tidyr::gather(df_w1,  key = "student", value = "A", Amy, Bob)  
-df_a$student<- factor(df_a$student)
-
-expect_equal(df_a,df_a1)
-expect_equal(df_a,df_a2)
-
-df_w2 <- Wide(df, student, c(A, B))
-df_w_l<-Long(list(A=c("Amy_A", "Bob_A" ), B=c("Amy_B", "Bob_B")), df_w2,
-             by =  ~ month,
-             key = "student",
-             key.levels= c("Amy", "Bob"))
-
-
-
-expect_equal(df,df_w_l)
-
+  df <- data.frame(
+    month = rep(1:3, 2),
+    student = rep(c("Amy", "Bob"), each = 3),
+    A = c(9, 7, 6, 8, 6, 9),
+    B = c(6, 7, 8, 5, 6, 7),
+    stringsAsFactors = TRUE
+  )
+  
+  df_w1 <- Wide(df[-4], student, A)
+  
+  df_a1 <- Long(Amy + Bob ~ month, df_w1, key = "student", value = "A")
+  
+  df_a2 <- Long(df_w1,
+                id.vars = 1,
+                key = "student",
+                value = "A")
+  
+  df_a <-
+    tidyr::gather(df_w1,  key = "student", value = "A", Amy, Bob)
+  df_a$student <- factor(df_a$student)
+  
+  expect_equal(df_a, df_a1)
+  expect_equal(df_a, df_a2)
+  
+  df_w2 <- Wide(df, student, c(A, B))
+  df_w_l <-
+    Long(
+      list(
+        A = c("Amy_A", "Bob_A"),
+        B = c("Amy_B", "Bob_B")
+      ),
+      df_w2,
+      by =  ~ month,
+      key = "student",
+      key.levels = c("Amy", "Bob")
+    )
+  
+  
+  
+  expect_equal(df, df_w_l)
+  
 
 })
 

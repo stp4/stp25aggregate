@@ -6,7 +6,8 @@ test_that("recast2 works", {
     Group = gl(2, 4, labels = c("Control", "Treat")),
     X = c(1, 1, 1, 1,   2, 2, 2, 2),
     Y = c(3, 3, 3, 3,   4, 4, 4, 4),
-    Z = c(5, 5, 5, 5,   6, 6, 6, 6)
+    Z = c(5, 5, 5, 5,   6, 6, 6, 6),
+    stringsAsFactors = TRUE
   )
   
   expect_equivalent(
@@ -16,14 +17,15 @@ test_that("recast2 works", {
     data.frame(
       Group  = c("Control", "Control", "Control", "Treat", "Treat", "Treat"),
       variable = c("X", "Y", "Z" , "X", "Y", "Z"),
-      value  = c(1, 3, 5, 2, 4, 6)
+      value  = c(1, 3, 5, 2, 4, 6),
+      stringsAsFactors = TRUE
     )
   )
   
   hyper1 <- hyper[, c("g", "chol0", "chol1", "chol6", "chol12")]
   expect_warning(hyper_long <- reshape2::melt(hyper1, id.vars = 1))
   
-    expect_equal(
+  expect_equal(
     aggregate(value ~ variable + g, hyper_long, mean)$value,
     Recast2(chol0 + chol1 + chol6 + chol12 ~ g, hyper, mean)$value
   )
