@@ -2,7 +2,7 @@
 #' @rdname CleanUp
 #' @title CleanUp
 #' @description Bereinigung der Labels
-#' \code{CleanUp_factor()} Die Labels von tbl_df werden ja als labelled -Attribut abgelegt und durch cleanup werden sie f?r APA2 lesber clenaUp.tbl_df
+#' \code{CleanUp_factor()} Die Labels von tibble::tibble werden ja als labelled -Attribut abgelegt und durch cleanup werden sie f?r APA2 lesber clenaUp.tibble::tibble
 #' @param data Date.Frame
 #' @param ... extra arguments
 #' @export
@@ -14,7 +14,7 @@ CleanUp <-
 
 
 #' @rdname CleanUp
-#' @description Die \code{CleanUp.tbl_df()} bereinigt die Faktoren da die Auswertung
+#' @description Die \code{CleanUp.tibble::tibble()} bereinigt die Faktoren da die Auswertung
 #' direkt oft nicht funktioniert
 #' @export
 CleanUp.tbl_df <- function(data, ...)
@@ -28,6 +28,7 @@ CleanUp.tbl_df <- function(data, ...)
 cleanup_names_encoding <-
   function(data, from = "UTF8" , to = "latin1") {
     #-    ?enc2utf8
+    # gsub("\\$", "", "$Hallo")
     names(data) <- gsub("\\$", "", iconv(names(data), from, to))
     data
   }
@@ -151,10 +152,10 @@ CleanUp_factor <- function(data,
   if (sum(y) > 0)
     data[which(y)] <-
       lapply(data[which(y)], Convert_To_Factor)
-  if (inherits(data, "tbl_df"))
+  if (tibble::is_tibble(data))
     data
   else
-    dplyr::tbl_df(data)
+    tibble::as_tibble(data)
 }
 
 

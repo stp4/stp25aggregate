@@ -2,20 +2,18 @@
 #' @title transform2
 #' @description Kopie von \link{transform} wobei die Labels
 #' mit upData2 ergaenzt werden. ist
-#' @param .data Daten
+#' @param data Daten
 #' @param ... alles an transform
 #' @export
-transform2<- function(.data, ...){
-  label_data_frame(transform(.data, ...), get_label(.data))
+transform2 <- function(data, ...) {
+  label_data_frame(transform(data, ...), get_label(data))
 }
-
 
 
 #' @rdname transform2
 #' @export
-
-mutate2<- function(.data, ...){
-  label_data_frame(dplyr::mutate(.data, ...), get_label(.data))
+mutate2 <- function(data, ...) {
+  label_data_frame(dplyr::mutate(data, ...), get_label(data))
 }
 
 
@@ -56,51 +54,50 @@ mutate2<- function(.data, ...){
 #' separate_multiple_choice(x$A)
 separate_multiple_choice <- function(x,
                                      sep = ", ",
-                                     labels=c("ja", "nein"),
-                                     levels=1:0,
-                                     prafix=  NULL,
+                                     labels = c("ja", "nein"),
+                                     levels = 1:0,
+                                     prafix =  NULL,
                                      into = NULL,
-                                     label=NULL,
-                                     na.strings=NULL#"999"
-) {
+                                     label = NULL,
+                                     na.strings = NULL) {
   # callingFun = as.list(sys.call(-1))[[1]]
   # calledFun = as.list(sys.call())[[1]]
-  if(!is.null(na.strings))
-       x[which(x==na.strings)] <- NA
-
-  if(is.null(prafix))
-    prafix <- paste0(gsub("^.*\\$","",deparse(substitute(x))),"_")
-
-
-  is_numeric_x<-FALSE
-
-  if(is.numeric(x)) {
+  if (!is.null(na.strings))
+    x[which(x == na.strings)] <- NA
+  
+  if (is.null(prafix))
+    prafix <- paste0(gsub("^.*\\$", "", deparse(substitute(x))), "_")
+  
+  
+  is_numeric_x <- FALSE
+  
+  if (is.numeric(x)) {
     is_numeric_x <- TRUE
     x <- as.character(x)
     x <- gsub("10", "a", x)
     x <- gsub("11", "b", x)
-
+    
     x <- gsub("(.)\\B", "\\1,", x)
     sep <- ","
   }
-
-#print(x)
+  
+  
   prafix <- gsub("[^[:alnum:]_]", "", prafix)
   #leere levels nicht  entfernen sondern behalten
   x <- as.character(x)
   x[is.na(x)] <- "XX_9999"
   x <- factor(x)
-
+  
   # separate braucht die Anzahl an Levels
   unique_elements <-
     unique(unlist(stringr::str_split(x, sep)), use.names = FALSE)
-#print(unique_elements)
+  #print(unique_elements)
   if (is.null(into))
     into <- paste0("M", 1:length(unique_elements))
-
+  
   # id ist zur kontrolle und name xxxx damit es zu keinen konflikten kommt
   res <-  data.frame(id = 1:length(x), xxxx = x)
-
+  
   res <-
     tidyr::separate(res,
                     "xxxx",
@@ -108,45 +105,45 @@ separate_multiple_choice <- function(x,
                     sep = sep,
                     remove = F)  ## Aufsplitten
   res <-
-    na.exclude(tidyr::gather(res, q2 , val,-id,-xxxx))   ## breit zu lang
-
+    na.exclude(tidyr::gather(res, q2 , val, -id, -xxxx))   ## breit zu lang
+  
   res <- tidyr::spread(dplyr::mutate(res, q2 = 1), val, q2)
   res[-1:-2][is.na(res[-1:-2])] <- 0
-
+  
   if (any(names(res) == "XX_9999")) {
-    res[which(res$XX_9999 == 1), -1] <- NA
-    res <- res[, -ncol(res)]
+    res[which(res$XX_9999 == 1),-1] <- NA
+    res <- res[,-ncol(res)]
   }
-
+  
   lbl <- names(res)[-1:-2]
   names(res)[-1:-2] <- names(lbl) <- paste0(prafix, 1:length(lbl))
-if(is.null(labels)) res<- res[-1:-2]
-else   res<- dapply2(res[-1:-2], function(z) factor(z, levels, labels))
+  if (is.null(labels))
+    res <- res[-1:-2]
+  else
+    res <- dapply2(res[-1:-2], function(z)
+      factor(z, levels, labels))
+  
+  if (!is.null(label) & is_numeric_x) {
+    lbl <- gsub("a", "10", lbl)
+    lbl <- gsub("b", "11", lbl)
+    
+    x <- as.numeric(lbl)
+    y <- 1:length(label)
+    used <- intersect(x, y)
+    not_used <- setdiff(y, used)
+    
+    names(res) <- paste0(prafix, used)
+    for (i in   not_used) {
+      res[paste0(prafix, i)] <- NA
+    }
+    
 
-  if(!is.null(label) & is_numeric_x){
-
-    lbl<-gsub("a", "10", lbl)
-    lbl<-gsub("b", "11", lbl)
-
-      x<- as.numeric(lbl)
-      y<- 1:length(label)
-      used<-intersect(x, y)
-      not_used <-setdiff(y,used)
-
-      names(res) <- paste0(prafix, used)
-      for(i in   not_used){
-        res[paste0(prafix, i)] <- NA
-      }
-
-     ## lbl<- label[yxdif]
-  names(label)<- paste0(prafix, 1:length(label))
-
-     # label_data_frame(res, label)
-  cf <- names(  res)
-   res[order(nchar(cf), cf)]
-
-  }else{
+    names(label) <- paste0(prafix, 1:length(label))
+    
+    cf <- names(res)
+    res[order(nchar(cf), cf)]
+    
+  } else{
     set_label(res, lbl)
   }
-
 }

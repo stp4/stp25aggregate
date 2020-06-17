@@ -25,6 +25,48 @@ GetData(): Ladet verschiedene Dateiformate von csv bis sav. Tabellen im
 Text-Format koennen direkt gelesen werden. Zurueckgegeben wird ein
 data.frame.
 
+    setwd("C:/Users/wpete/Dropbox/3_Forschung/R-Project/stp25aggregate")
+    
+    x <- "fa\xE7ile"
+    
+    Encoding(x)
+    Encoding(x) <- "latin1"
+    x
+    xx <- iconv(x, "latin1", "UTF-8")
+    Encoding(c(x, xx))
+    c(x, xx)
+    
+    xx<- "Abc ÖÄÜ ÖÄÜ?"
+    
+    Encoding(xx) <- "bytes"
+    xx # will be encoded in hex
+    
+    #Encoding(xx)<-  "latin1"
+    xx
+    #iconv(xx, Encoding(xx), "UTF-8")
+    
+    
+    require(stpvers)
+    require(readr)
+    
+    str(GetData("data/Data-default.csv", sep=","))
+    GetData("data/Data-ansi.csv", sep=",")
+    GetData("data/Data-utf8.csv", sep=",")
+    
+    
+     read.csv("data/Data-default.csv" )
+    read.csv("data/Data-ansi.csv")
+    read.csv("data/Data-utf8.csv")
+    
+    read.csv("data/Data-default.csv" , check.names = FALSE, stringsAsFactors =FALSE)
+    read.csv("data/Data-ansi.csv", check.names = FALSE)
+     read.csv("data/Data-utf8.csv", check.names = FALSE)
+    guess_encoding("data/Data-default.csv")
+    read_csv("data/Data-default.csv")
+    
+    read_csv("data/Data-ansi.csv")
+    read_csv("data/Data-utf8.csv")
+
 ``` r
 dat<-GetData("
 sex treatment control
@@ -34,15 +76,8 @@ f  3 4
 Tabel_Expand = TRUE, id.vars = 1)
 #> 
 #> 
-#> File: 
-#>  
-#> sex treatment control
-#> m  2 3
-#> f  3 4
-#>    character 
-#> 
-#> read.text2
-#> Sun May 03 07:36:41 2020
+#> read-text
+#> Wed Jun 17 09:08:18 2020
 head(dat)
 #>   sex     value
 #> 1   m treatment
@@ -54,20 +89,114 @@ head(dat)
 #xtabs(~sex +value, dat)
 ```
 
+``` 
+#  library("readxl")
+
+DF <- GetData(
+  data_file = 'Raw data/Tabelle Beugesehnen.xlsx',
+  raw_data = "Raw data/Beugesehnen-2.Rdata",
+  sheet = 1,
+  skip = 1
+)
+ 
+```
+
 Andere Packete für SPSS und XLSX
 
 ``` 
-  library("readxl")
+
+  library(excel.link)
+  library(readxl)
   
-  DF <- read_excel("Raw data/MIH Fragenkatalog.xlsx")
-
-```
-
-``` r
+  fil1 <-
+    "Raw data/LTx-Datenbank aktuell_1-last_NMPvs non NMP.xlsx"
+  dat1 <- readxl::read_excel(fil1, sheet = 1)
+  
+  fil2 <- "Raw data/Metra LTX Datenbank 03-04-20.xlsx"
+  sheet1 <- "Minimal Data Set Metra Patients"
+  sheet2 <- "non transplanted organs"
+  
+  dat2 <- excel.link::xl.read.file(
+    fil2,
+    password = "BC82",
+    xl.sheet = "Minimal Data Set Metra Patients",
+    top.left.cell = "A2"
+  )
 
 library("rio")
-# Excel (.xls and .xlsx), using haven::read_excel.
-# SPSS (.sav), using haven::read_sav 
+ Excel (.xls and .xlsx), using haven::read_excel.
+ SPSS (.sav), using haven::read_sav 
+```
+
+## Clean Names
+
+``` r
+clean_names(tibble::tibble("Öli"=1:3, "p-k"=1:3, "95%-CI"=4:6) )
+#> # A tibble: 3 x 3
+#>    oeli   p.k x95.pct.ci
+#>   <int> <int>      <int>
+#> 1     1     1          4
+#> 2     2     2          5
+#> 3     3     3          6
+
+clean_names(
+  c(
+    "  a", "a  ", "a %", "a",
+    "$a", "$$$a", "GDP ($)",
+    "GDP (us$)", "a (#)", "a & b",
+    "#", "$", "a_cnt", "Aa&Bb",
+    "camelCasePhrases", "AlphaBetaGamma",
+    "Alpha       Beta", "Beta  !!! Gamma",
+    "a + b", "a - b", "a * b", "Ösel"
+  ), abbreviate=TRUE
+)
+#>  [1] "a"       "a.1"     "apct"    "a.2"     "a.3"     "a.4"     "gdp"    
+#>  [8] "gdps"    "acnt"    "aandb"   "cnt"     "x"       "acnt.1"  "andbb"  
+#> [15] "cmlc"    "alphbtg" "alphabt" "btgm"    "ab"      "ab.1"    "ab.2"   
+#> [22] "oesl"
+```
+
+## Add\_rows
+
+``` r
+df <-   data.frame(
+  Source = c("A", "B", "C", "F"),
+  x = 1:4,
+  y = 1:4,
+  stringsAsFactors = FALSE
+)
+
+add_row_df(df, c("Erste Zeile" = 1, "Dritte" = 3))
+#>        Source  x  y
+#> 5 Erste Zeile NA NA
+#> 1           A  1  1
+#> 2           B  2  2
+#> 6      Dritte NA NA
+#> 3           C  3  3
+#> 4           F  4  4
+add_row_df(df, c("Erste Zeile" = 1, "letzte" = 5))
+#>        Source  x  y
+#> 5 Erste Zeile NA NA
+#> 1           A  1  1
+#> 2           B  2  2
+#> 3           C  3  3
+#> 4           F  4  4
+#> 6      letzte NA NA
+add_row_df(df, "Erste Zeile")
+#>        Source  x  y
+#> 5 Erste Zeile NA NA
+#> 1           A  1  1
+#> 2           B  2  2
+#> 3           C  3  3
+#> 4           F  4  4
+add_row_df(df, c("Erste Zeile", "Zweite"))
+#>        Source  x  y
+#> 5 Erste Zeile NA NA
+#> 1           A  1  1
+#> 6      Zweite NA NA
+#> 2           B  2  2
+#> 3           C  3  3
+#> 4           F  4  4
 ```
 
 Data and Variable Transformation Functions
@@ -127,6 +256,23 @@ df[-4] %>%
 #> 1     1     9     8
 #> 2     2     7     6
 #> 3     3     6     9
+
+df %>% Wide( month ~ student, A)
+#> # A tibble: 3 x 3
+#>   month   Amy   Bob
+#>   <dbl> <dbl> <dbl>
+#> 1     1     9     8
+#> 2     2     7     6
+#> 3     3     6     9
+
+
+df %>% Wide( student, c(A, B))
+#> # A tibble: 3 x 5
+#>   month Amy_A Amy_B Bob_A Bob_B
+#>   <dbl> <dbl> <dbl> <dbl> <dbl>
+#> 1     1     9     6     8     5
+#> 2     2     7     7     6     6
+#> 3     3     6     8     9     7
 ```
 
 ### Vergleich der Ergebnisse gather vs Long
@@ -164,119 +310,6 @@ df[-4] %>%
 #> 6     3 Bob         9
 ```
 
-``` r
-
-df[-4] %>%
-  tidyr::pivot_wider(names_from = student, 
-                     values_from = A, 
-                     names_prefix = "Student_") %>%
-  knitr::kable()# %>%
-```
-
-<table>
-
-<thead>
-
-<tr>
-
-<th style="text-align:right;">
-
-month
-
-</th>
-
-<th style="text-align:right;">
-
-Student\_Amy
-
-</th>
-
-<th style="text-align:right;">
-
-Student\_Bob
-
-</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-<tr>
-
-<td style="text-align:right;">
-
-1
-
-</td>
-
-<td style="text-align:right;">
-
-9
-
-</td>
-
-<td style="text-align:right;">
-
-8
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:right;">
-
-2
-
-</td>
-
-<td style="text-align:right;">
-
-7
-
-</td>
-
-<td style="text-align:right;">
-
-6
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:right;">
-
-3
-
-</td>
-
-<td style="text-align:right;">
-
-6
-
-</td>
-
-<td style="text-align:right;">
-
-9
-
-</td>
-
-</tr>
-
-</tbody>
-
-</table>
-
-``` r
-  #kableExtra::kable_styling()
-```
-
 ### Long mit meheren Parametern
 
 ``` r
@@ -308,29 +341,28 @@ Student\_Bob
 ``` r
 mean3<- function(x)round(mean(x, na.rm=TRUE), 1)
 
-    Summarise(A + B ~ student, df, mean3, key = "group", value = "cbc")
+    Summarise(A + B ~ student, df, fun=mean3, key = "group", value = "cbc")
 #>   student group cbc
 #> 1     Amy     A 7.3
-#> 2     Amy     B 7.0
-#> 3     Bob     A 7.7
+#> 3     Amy     B 7.0
+#> 2     Bob     A 7.7
 #> 4     Bob     B 6.0
-    Summarise(A + B ~ student, df, mean3,  margins = TRUE)
-#>    student variable value
-#> 1      Amy        A   7.3
-#> 2      Amy        B   7.0
-#> 3      Bob        A   7.7
-#> 4      Bob        B   6.0
-#> 11  gesamt        A   7.5
-#> 21  gesamt        B   6.5
+    Summarise(A + B ~ student, df, fun=mean3,  margins = TRUE)
+#>   student variable value
+#> 1     Amy        A   7.3
+#> 2     Amy        B   7.0
+#> 3     Bob        A   7.7
+#> 4     Bob        B   6.0
+#> 5   Total        A   7.5
+#> 6   Total        B   6.5
     Summarise(A + B ~ student,
                       df,
-                      mean3,
+                      fun=mean3,
                       formula = variable ~ student,
                       margins = TRUE)
-#>   variable Amy Bob (all)
+#>   variable Amy Bob Total
 #> 1        A 7.3 7.7   7.5
 #> 2        B 7.0 6.0   6.5
-#> 3    (all) 7.2 6.8   7.0
 ```
 
 ### Aufdröseln vom Mehrfachantworten
@@ -465,16 +497,16 @@ calc.mean(
   m = c(mean(x1), mean(x2)),
   sd = c(sd(x1), sd(x2))
 )
-#>   value  n        m       sd      var
-#> 1     1  4 1.133962 2.922614 8.541674
-#> 2     2 10 3.519869 2.217147 4.915741
-#> 3 total 14 2.838181 2.573999 6.625471
+#>   value  n        m        sd       var
+#> 1     1  4 3.147656 0.9919496 0.9839641
+#> 2     2 10 4.246774 1.9139392 3.6631633
+#> 3 total 14 3.932740 1.7402909 3.0286123
 mean(c(x1, x2))
-#> [1] 2.838181
+#> [1] 3.93274
 sd(c(x1, x2))
-#> [1] 2.573999
+#> [1] 1.740291
 var(c(x1, x2))
-#> [1] 6.625471
+#> [1] 3.028612
 
 
 calc.mean(
@@ -482,17 +514,17 @@ calc.mean(
   m = c(mean(x1), mean(x2), mean(x3)),
   sd = c(sd(x1), sd(x2) , sd(x3))
 )
-#>    value  n        m       sd       var
-#> 1      1  4 1.133962 2.922614  8.541674
-#> 2      2 10 3.519869 2.217147  4.915741
-#> 3      3 11 4.450399 3.383463 11.447822
-#> 31 total 25 3.547557 3.004307  9.025863
+#>    value  n        m        sd       var
+#> 1      1  4 3.147656 0.9919496 0.9839641
+#> 2      2 10 4.246774 1.9139392 3.6631633
+#> 3      3 11 3.983341 2.5346524 6.4244628
+#> 31 total 25 3.955005 2.0779834 4.3180150
 mean(c(x1, x2, x3))
-#> [1] 3.547557
+#> [1] 3.955005
 sd(c(x1, x2, x3))
-#> [1] 3.004307
+#> [1] 2.077983
 var(c(x1, x2, x3))
-#> [1] 9.025863
+#> [1] 4.318015
 
 
 
@@ -554,4 +586,4 @@ df
 #> 15  0.3923676 -2.12929920  0.49804261     B
 ```
 
-## Berechnungen mit tydy
+## Berechnungen mit tidy

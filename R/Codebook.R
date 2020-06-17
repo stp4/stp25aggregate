@@ -1,5 +1,3 @@
-
-
 #' Codebook
 #' 
 #' Extrahier die Daten-Struktur

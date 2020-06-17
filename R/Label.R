@@ -1,33 +1,42 @@
-#' @rdname CleanUp
-#' @description Die Funktion \code{Label()} erstellt die
-#' Labels die bei den Tabellen
-#' verwendet werden. Im Unterschied zu \code{UpData2()} arbeitet diese Funktion mit
-#'   (...) argument.
+#' Label
+#'
+#' Setzen des attr(data, "label")
+#' @param data data.frame
+#' @param ... Labels in der Form a="Hallo, b="Welt"
 #' @export
 #' @examples
 #'
-#' #-- Label
-#' # Steko<- GetData("Steko.sav") %>%
-#' # Drop_NA(key) %>%
-#' #   mutate(jahr = factor(jahr)) %>%
-#' #   Label( BMI = "Body-Mass-Index",
-#' #         WHtR =  "Waist-Height-Ratio",
-#' #         WHtR_1 ="Waist-Height-Ratio",
-#' #         bildprof = "Bildungsprofil",
-#' #         jahr = "Jahr")
-#' #
-#' # MobilePayment %>%
-#' #  select(Q2_1:Q2_4) %>%
-#' #   Label("Computer", "Laptop", "Tablet", "Mobiltelefon" )
+#' df <- data.frame(
+#' BMI=c(1,2,3,1,2,3),
+#' WHtR= gl(2,3, labels =c("Amy", "Bob")),
+#' WHtR_1=c(9,7,6,8,6,9),
+#' bildprof=c(6,7,8,5,6,7)
+#' )
 #'
-Label<- function(data, ...){
-  lbl<- list(...)
+#' DF<-
+#'   Label(df, BMI = "Body-Mass-Index",
+#'         WHtR =  "Waist-Height-Ratio",
+#'         WHtR_1 ="Waist-Height-Ratio"
+#'   )
+#'
+#' DF$BMI<- units::set_units(DF$BMI, kg/m2)
+#'
+#' get_label(DF)
+#' get_label(DF, include.units=TRUE)
+#' DF<- set_label(DF, c(bildprof = "Bildungsprofil"))
+#' get_label(DF)
+#' DF<- delet_labels(DF)
+#' get_label(DF)
+#'
+#'
+Label <- function(data, ...) {
+  lbl <- list(...)
   if (length(lbl) == 0) {
     message("Label: Keine Labels gefunden!")
     return(data)
-  }else{
-    if(is.null(names(lbl))) {
-      message("Label: Keine Namen gefunden! Verwende daher names(data)" )
+  } else{
+    if (is.null(names(lbl))) {
+      message("Label: Keine Namen gefunden! Verwende daher names(data)")
       names(lbl) <-  names(data)[1:length(lbl)]
     }
     set_label(data, lbl)
@@ -35,25 +44,25 @@ Label<- function(data, ...){
 }
 
 
-
-
-#' @rdname get_label
-#' @description DeletLabels:  Loeschen des Attributs label
+#' @rdname Label
+#' @description delet_labels:  Loeschen aller Attributs label
 #'
 #' @export
- 
-delet_labels <- function(data){
+delet_labels <- function(data) {
   for (n in names(data))
     attr(data[[n]], "label") <- NULL
   data
 }
 
 
-#' @rdname get_label
-#' @param labels Labels
+#' @rdname Label
+#' @description set_label:  Setzen  der Attributs label
+#' @param labels Labels als Character-String mit Namen c(a="Hallo, b="Welt")
+#'
+#' @export
 set_label <- function(data, labels = NULL) {
   if (is.null(labels)) {
-    message("Warnung label_data_frame: Keine Labels gefunden!\n")
+    message("Warnung set_label: Keine Labels gefunden!\n")
     return(data)
   } else {
     nms <- names(data)
@@ -66,75 +75,77 @@ set_label <- function(data, labels = NULL) {
   data
 }
 
-#' @rdname CleanUp
-#' @description Intern wenn mit get_label nur die Kopie wiederhergestellt wird
- 
-label_data_frame  <- function(x, labels) {
-  if (all(names(x) == names(labels))) {
-    for (i in names(x)) {
-      attr(x[[i]], "label") <- labels[[i]]
-    }
-    x
-  }
-  else
-    set_label(x, labels)
-  
-}
 
-#' get_label
-#' 
-#' Labels ohne die unit bei GetLabelOrName weid auch die unit verwendet.
-#'
-#' @param x  data.drame
-#'
-#' @return Namend Character String
+#' @rdname Label
+#' @description get_label und GetLabelOrName:  Abrufen  der Attributs label
 #' @export
-get_label <- function(x) {
-  lbl <- lapply(x, attr, "label")
-if(length(lbl)==0) return(NULL)
+#' 
+#' @examples 
+#' 
+#'
+get_label <- function(data, 
+                      include.units = FALSE
+                     # , include.names=options()$stp25$include_names
+                      ) {
+  lbl <- lapply(data, attr, "label")
+  if (length(lbl) == 0)
+    return(NULL)
   
   unlabl <- which(sapply(lbl, is.null))
+  # if (!is.null(include.names)){
+  #   lbl[unlabl] <- ""
+  #   lbl <- unlist(lbl) 
+  #   lbl_nams <- names(lbl)
+  #   lbl <- paste0(lbl_nams, ": ", lbl)
+  #   names(lbl) <- lbl_nams
+  # }else{
   lbl[unlabl] <- names(lbl[unlabl])
-  unlist(lbl)
-
-}
-
-#' @rdname get_label
-#' @description  Extrahiert die Labels
-#' @param pattern pattern = "[\\._]+"
-#' @param replacement Leerzeichen
-#' @export
-#' @examples
-#' 
-#' # GetLabelOrName(data, pattern="störender string")
-#'
-GetLabelOrName <- function(x,
-                           pattern = NULL,
-                           replacement = " ") {
-  if (length(x) < 1) {
-    return(NULL)
-  } else {
-    xnames  <- names(x)
- 
-    xlabel <-  get_label(x)  
-    df_names <- if (is.null(pattern)) xnames
-    else gsub(" $", "", gsub(pattern, replacement, xnames), 
-              perl = TRUE)
-    #   gsub(pattern, replacement, names(x), perl=T )
-    # xlabel <- ifelse(xlabel == "", df_names, xlabel)
-    
-    is_units <- sapply(x, function(z) inherits(z, "units"))
+  lbl <- unlist(lbl) 
+#  }
+  
+  if (include.units) {
+    is_units <- sapply(data, function(z)
+      inherits(z, "units"))
     if (any(is_units)) {
-      my_units <-
-        sapply(x, function(z)
+      lbl_nams <- names(lbl)
+      
+      lbl_units <-
+        sapply(data, function(z)
           if (inherits(z, "units"))
             paste0(" [", as.character(attr(z, "units")), "]")
           else
             "")
-      xlabel <-  paste0(xlabel, my_units)
-      names(xlabel) <- xnames
+      lbl <-  paste0(lbl, lbl_units)
+      names(lbl) <- lbl_nams
     }
   }
-  xlabel
+  lbl
 }
 
+
+#' @rdname Label
+#' @param include.units Einheiten 
+#' @export
+#'
+GetLabelOrName <- function(data, include.units = TRUE) {
+  get_label(data, include.units)
+}
+
+#' @rdname Label
+#' @param data data.frame
+#'
+#' @param labels labels als named vector
+#' 
+#' @description  Intern wenn mit get_label nur die Kopie wiederhergestellt wird.
+#'
+label_data_frame  <- function(data, 
+                              labels) {
+  if (all(names(data) %in% names(labels))) {
+    for (i in names(data)) {
+      attr(data[[i]], "label") <- labels[[i]]
+    }
+    data
+  }
+  else
+    set_label(data, labels)
+}

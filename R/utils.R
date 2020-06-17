@@ -1,3 +1,6 @@
+#
+# in Recast2 verwendet
+#
 all_identical2 <- function(data) {
   if (ncol(data) < 2) {
     TRUE
