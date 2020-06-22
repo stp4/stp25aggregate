@@ -7,7 +7,8 @@ Melt2 <- function(x, ...) {
 
 
 #' @rdname Long
-#' @description Melt2.formula: Melt2(chol0+chol1+chol6+chol12~g, hyper)
+#' @description Melt2 reshape2::melt()
+#' 
 #' @export
 #'
 #' @param data Daten
@@ -45,7 +46,6 @@ Melt2.formula <-   function(x,
 }
 
 #' @rdname Long
-#' @description Melt2.data.frame ist wie melt zu verwenden aber die Labels werden dabei benuzt.
 #' @export
 #' @examples
 #'
@@ -80,7 +80,7 @@ Melt2.data.frame <- function(x,
 
 
 #' @rdname Long
-#' @description Melt2.default gibt alles ausser die data.frames und Formeln an reshape2::melt weiter.
+#' @export
 Melt2.default <- function(data, ...,
                           key = "variable", 
                           value = "value") {
@@ -89,7 +89,7 @@ Melt2.default <- function(data, ...,
 }
 
 #' @rdname Long
-#' @description melt2 ist die lazy_dots-Methode
+#' @description melt2 ist die lazy_dots-Methode fur reshape2::melt()
 #' @export
 #' @param by Gruppierung
 #' @examples
@@ -122,7 +122,7 @@ melt2 <-
       else  measure <- setdiff(names(x), by)
     }
 
-    molten <- reshape2::melt (
+    molten <- reshape2::melt(
       x,
       id.vars = by,
       measure.vars = measure,

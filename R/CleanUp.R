@@ -74,15 +74,20 @@ CleanUp.default  <- function (data = NA,
                               variable.names = names(data),
                               ...)
 {
+  
+  cat("\nCleanUp: \n", 
+      "\n uselabels =",uselabels,
+      "\n na.strings = ",na.strings,
+      "\n force.numeric =" ,force.numeric,
+      "\n encoding = ",encoding,
+      "\n sep = ", sep, "\n"
+      )
+  
   mylabels <-
-    if (is.null(variable.labels))
-      get_label(data) ##Hmisc::label(data)
-  else
-    variable.labels
+    if (is.null(variable.labels)) get_label(data)  else variable.labels
   
   # alle Lehrzeichen am Ende
-  mylabels <-  gsub("[[:space:]]*$", "",
-                    mylabels)
+  mylabels <-  gsub("[[:space:]]*$", "", mylabels)
   if (uselabels) {
     mylabels <- gsub("[^[:alnum:]]", " ", mylabels)
     mylabels <- gsub("[ ]+", sep, mylabels)
@@ -95,11 +100,14 @@ CleanUp.default  <- function (data = NA,
   
   data <- data.frame(lapply(data,
                             function(x) {
-                              if (!is.null(na.strings))
+                              if (!is.null(na.strings)){
+                              
                                 x[which(x  %in%  na.strings)] <- NA
+                                }
                               
                               if (any(class(x) == "factor")) {
                                 if (!force.numeric) {
+                                 # cat("\n", names(x), "Clean_String")
                                   levels(x) <- Clean_String(levels(x), encoding)
                                   #sicherstellen dass nur Factor rauskommt
                                   factor(x,  levels(x))

@@ -76,6 +76,7 @@ subset2 <- function(data, ...) {
 
 
 #' @rdname Filter2
+#' @description Select_case, subset2 \code{base::subset()}
 #' @export
 #'
 Select_case <- function(data, ..., output = TRUE) {
@@ -88,7 +89,7 @@ Select_case <- function(data, ..., output = TRUE) {
 }
 
 #' @rdname Filter2
-#' @description  \code{Filter2} copie of dplyr::filter \code{Select_case} und \code{subset2} copie of base::subset(...)
+#' @description  Filter2 \code{dplyr::filter()}
 #' @export 
 #'
 Filter2 <- function(data, ...) {
@@ -102,7 +103,7 @@ Filter2 <- function(data, ...) {
 
 
 #' @rdname Filter2
-#' @description  \code{Drop_NA} entfernt Fälle mit NAs mit \code{dplyr::filter(data, ...)} wenn \code{...} leer ist ann alle also quasi na.omit
+#' @description  Drop_NA    \code{tidyr::drop_na()}
 #' @export
 #'
 Drop_NA <- function(data, ..., output = TRUE) {
@@ -128,7 +129,7 @@ Drop_NA <- function(data, ..., output = TRUE) {
 
 
 #' @rdname Filter2
-#' @description \code{Drop_case} entfernt Fälle arbeitet mit data[-subset, ] + label_data_frame()
+#' @description Drop_case   \code{edata[-subset, ] }
 #' @export
 #' @param subset Ausgewählte Fälle Position als Zahl
 Drop_case <- function(data,

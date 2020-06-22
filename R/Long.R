@@ -1,8 +1,7 @@
-#' Umformen (reshape)
+#' Long und Wide  
 #'
-#' Umformen von einem Breit-Format nach einem Lang-Format. Melt2 und melt2 sind
-#' Erweiterungen der reshape2::melt Funktion. Intern wird  melt und dcast verwendet.
-#' @param x Objekt kann Formel oder data.frame sein
+#'  Erweiterung von tidyr::pivot_longer tidyr::pivot_wider
+#' @param x data.frame oder formula
 #' @param ... weitere Argument 
 #'
 #' @return data.frame
@@ -43,39 +42,96 @@ Long <- function(x, ...) {
 
 #' @rdname Long
 #' @export
-Long.formula <- function(x, data,  
+Long.formula <- function(x,
+                         data,
                          key = "variable",
-                         value = "value", 
+                         value = "value",
                          ...) {
-  is_tbl <- dplyr::is.tbl(data)
-  molten <- Melt2.formula(x, data, 
-                          key = key,
-                          value = value,  
-                          ...)
-  if (is_tbl) tibble::as_tibble(molten)
-  else molten
+
+  x <- stp25formula:::clean_dots_formula(x, names_data = names(data))
+  rhs <- all.vars(x[-3])
+  lhs <- all.vars(x[-2])
+  
+  data <- data[c(rhs, lhs)]
+  lvl <-  get_label(data[rhs])
+  
+  rstl  <-
+    tidyr::pivot_longer(data, 
+                        cols = all_of(rhs),
+                        names_to = key, values_to =value)
+  rstl[[key]] <- factor(rstl[[key]] , names(lvl), lvl)
+  
+  rstl
 }
 
 #' @rdname Long
 #' @export
-Long.data.frame <- function(data, ..., 
+Long.data.frame <- function(data,
+                            ...,
+                            by = NULL,
                             key = "variable",
                             value = "value",
-                            id.vars = NULL) {
-  is_tbl <- dplyr::is.tbl(data)
-  if (is.null(id.vars))
-    molten <- melt2(data, ..., key = key,
-                    value = value)
-  else
-    molten <- Melt2.data.frame(data, id.vars=id.vars,  
-                               key = key,
-                               value = value, 
-                               ...)
+                            id.vars = all.vars(by)) {
+  measure.vars <-
+    sapply(lazyeval::lazy_dots(...), function(x) {
+      as.character(x[1])
+    })
   
-  if (is_tbl) tibble::as_tibble(molten)
-  else molten
+  if(length(measure.vars)==0){ 
+    measure.vars  <- 
+      if(length(id.vars)==0) names(data)  else names(data[-id.vars])
+    }
+  else {
+    if(length(measure.vars)==1 & grepl('~', measure.vars[1] ))
+      return( Long.formula(formula(measure.vars[1]), data,  key, value) )
+       
+    data <- data[c(measure.vars, id.vars)]
+    
+    }
   
+  lvl <-  get_label(data[measure.vars])
+  rstl <-
+    tidyr::pivot_longer(data, 
+                        cols = measure.vars,
+                        names_to = key, values_to =value)
+  rstl[[key]] <- factor(rstl[[key]], names(lvl), lvl)
+  
+  rstl
 }
+
+
+# Long.formula <- function(x, data,  
+#                          key = "variable",
+#                          value = "value", 
+#                          ...) {
+#   is_tbl <- dplyr::is.tbl(data)
+#   molten <- Melt2.formula(x, data, 
+#                           key = key,
+#                           value = value,  
+#                           ...)
+#   if (is_tbl) tibble::as_tibble(molten)
+#   else molten
+# }
+# 
+# 
+# Long.data.frame <- function(data, ..., 
+#                             key = "variable",
+#                             value = "value",
+#                             id.vars = NULL) {
+#   is_tbl <- dplyr::is.tbl(data)
+#   if (is.null(id.vars))
+#     molten <- melt2(data, ..., key = key,
+#                     value = value)
+#   else
+#     molten <- Melt2.data.frame(data, id.vars=id.vars,  
+#                                key = key,
+#                                value = value, 
+#                                ...)
+#   
+#   if (is_tbl) tibble::as_tibble(molten)
+#   else molten
+#   
+# }
 
 
  
@@ -206,3 +262,4 @@ Long.list <- function(x,
 #   else molten
 # }
  
+

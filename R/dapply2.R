@@ -1,6 +1,6 @@
 #' Dapply 
 #' 
-#' Apply mit Hmisc labels, Arbeitet mit lply().
+#' Dapply, dapply2 ist  plyr::llply()
 #' 
 #' @param x Objekt
 #' @param ... Weitere Argumente an llply
