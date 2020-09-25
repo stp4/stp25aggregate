@@ -39,7 +39,7 @@ Label <- function(data, ...) {
       message("Label: Keine Namen gefunden! Verwende daher names(data)")
       names(lbl) <-  names(data)[1:length(lbl)]
     }
-    set_label(data, lbl)
+    set_label(data, unlist(lbl))
   }
 }
 

@@ -58,3 +58,56 @@ test_that("subset2 works", {
   
   
 })
+
+
+
+test_that("Filter2 works", {
+dat <- data.frame(
+  nr= 1:5,
+  sex = factor(c(1, 2, 1, 2, 1), 1:3, c("m", "f", "t")),
+  treatment = c("A", "A", "B", "B", "A"),
+  m1 = c(1, NA, 2, 1, 1),
+  m2 =  c(1, 5, NA, 1, 1),
+  m3 = c(2, 1, 5, 1, 1),
+  m4 = c(3, 2,2, 2, 1),
+  m5 = c(5, 2, 3, 1, 2),
+  m6 = c(4, 1, 4, 1, 1)
+)
+ 
+dat <- Label(
+  dat,
+  sex = "Geschlecht",
+  treatment = "Behandlung",
+  m1 = "Cohlesterin",
+  m2 = "Billirubin"
+)
+dat <- tibble::as_tibble(dat)
+
+s1<-Filter2(dat, treatment == "A" & sex=="m")
+s2<-subset2(dat, treatment == "A" & sex=="m" )
+s3<-Select_case(dat, treatment == "A" & sex=="m", output=FALSE)
+s4<- Drop_case(dat, c(2:4))
+expect_equal(s1,s2)
+expect_equal(s1,s2)
+expect_equal(s1,s3)
+
+expect_equal(
+  get_label(s1),
+  c(
+    nr = "nr" ,
+    sex = "Geschlecht" ,
+    treatment = "Behandlung" ,
+    m1 = "Cohlesterin",
+    m2 = "Billirubin",
+    m3 = "m3",
+    m4 = "m4",
+    m5 = "m5"  ,
+    m6 = "m6"
+  )
+)
+
+#Drop_NA(dat, m1)
+#Drop_NA(dat)
+
+
+})

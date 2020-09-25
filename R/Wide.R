@@ -6,8 +6,8 @@
 #' @export
 #'
 #' @examples
-#' #
-#'   suppressPackageStartupMessages(library(tidyverse))
+#' 
+#' #  suppressPackageStartupMessages(library(tidyverse))
 #'
 #' dat <- data.frame(
 #'   month = rep(1:3, 2),
@@ -24,12 +24,11 @@
 #' dat  %>% Wide(month ~ student, A)
 #' dat  %>% Wide(student ~ month, A)
 #'
-#' Long <- function(x, ...) {
 Wide <- function(...) {
   UseMethod("Wide")
 }
 
-#' @rdname Wide
+#' @rdname Long
 #' @export
 Wide.formula <- function(x,
                          data,
@@ -62,7 +61,7 @@ Wide.formula <- function(x,
 }
 
 
-#' @rdname Wide
+#' @rdname Long
 #' @export
 Wide.data.frame <- function(data, key, value) {
   # if (!dplyr::is.tbl(data))

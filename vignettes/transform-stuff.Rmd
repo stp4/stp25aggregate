@@ -16,8 +16,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, include=FALSE}
-library(stp25aggregate)
-library(stp25data)
+library(stpvers)
 library(tidyverse)
 
 hyper$chol0[c(1,5)]<- NA
@@ -74,7 +73,7 @@ tidyr::spread(df[-4], student, A)
 
 ```{r}
 
-(df_w2 <- Wide(df, student, c(A, B)))
+(df_w2 <- Wide(df, student, c("A", "B")))
  Long(list(A=c("Amy_A", "Bob_A" ), B=c("Amy_B", "Bob_B")), df_w2,
              by =  ~ month,
              key = "student",
@@ -88,14 +87,14 @@ tidyr::spread(df[-4], student, A)
 
 
 ```{r}
-Summarise(A + B ~ student, df, mean3, key = "group", value = "cbc")
+Summarise(A + B ~ student, df, fun=mean3, key = "group", value = "cbc")
 
 
-Summarise(A + B ~ student, df, mean3,  margins = TRUE)
+Summarise(A + B ~ student, df, fun=mean3,  margins = TRUE)
 
 Summarise(A + B ~ student,
                   df,
-                  mean3,
+                  fun=mean3,
                   formula = variable ~ student,
                   margins = TRUE)
 ```
@@ -228,7 +227,7 @@ hyper_long <- Long(
 
 ```{r}
 
-hyper_long %>% Wide(Zeit, c(chol, rrs, rrd))
+hyper_long %>% Wide(Zeit, c("chol", "rrs", "rrd"))
 
 ```
 
@@ -266,12 +265,12 @@ vrs<- c("nr", "med", "a", "gr", "gew", "chol0", "chol1", "chol6")
 
 ###  base::aggregare
 
-```{r}
-funny<- function(x) round(mean(x),1)
+```{r, results='asis'}
+funny<- function(x) round(mean(x), 1)
  
 hyper_long <- Long(hyper, chol0, chol1, chol6, chol12, by=~g)
 aggregate( value~variable, hyper_long, funny) %>% 
-  kable(caption="aggregate")
+  Output(caption="aggregate")
 
 
 
@@ -280,7 +279,7 @@ hyper_long<-Long(chol0+chol1+chol6+chol12~g,
 #-- Spread + aggragate
 aggregate(Cholesterin~Zeit+g, hyper_long, funny) %>%
   spread(g, Cholesterin) %>% 
-  kable(caption="aggregate mit spread")
+  Output(caption="aggregate mit spread")
 
 
 ```
@@ -293,11 +292,11 @@ aggregate(Cholesterin~Zeit+g, hyper_long, funny) %>%
   das gleiche wie aggragate
   
   
-```{r}
+```{r, results='asis'}
 hyper_long %>% group_by(Zeit, g) %>%
   summarise(Cholesterin=funny(Cholesterin)) %>%
   spread(g, Cholesterin) %>% 
-  kable(caption="dplyr mit spread")
+  Output(caption="dplyr mit spread")
 ```
   
 
@@ -305,10 +304,10 @@ hyper_long %>% group_by(Zeit, g) %>%
  
 Summarise  Recast2 das gleiche wie oben
 
-```{r}
-Summarise(chol0+chol1+chol6+chol12~g, hyper, funny,
+```{r, results='asis'}
+Summarise(chol0+chol1+chol6+chol12~g, hyper, fun=funny,
         formula=variable~g) %>% 
-  kable(caption="Summarise mit formula")
+  Output(caption="Summarise mit formula")
 
 
 ```
@@ -316,46 +315,48 @@ Summarise(chol0+chol1+chol6+chol12~g, hyper, funny,
 
   das gleiche wie oben nur mit spread
 
-```{r}
+```{r, results='asis'}
 
-Summarise(chol0+chol1+chol6+chol12~g, hyper, funny,
-        "Zeit", "Cholesterin") %>%
-  spread(g, Cholesterin) %>% 
-  kable(caption="Summarise mit spread")
+Summarise(
+  chol0 + chol1 + chol6 + chol12 ~ g,
+  hyper,
+  fun = funny,
+  key = "Zeit",
+  value = "Cholesterin"
+) %>%
+  spread(g, Cholesterin) %>%
+  Output(caption = "Summarise mit spread")
 
 ```
 
 und noch die margins
-```{r}
-Summarise(chol0+chol1+chol6+chol12~g, hyper,
-          funny,formula=variable~g, margins=TRUE) %>% 
-  kable(caption="Summarise mit margins")
+```{r, results='asis'}
+Summarise(
+  chol0 + chol1 + chol6 + chol12 ~ g,
+  hyper,
+  fun = funny,
+  formula = variable ~ g,
+  margins = TRUE
+) %>%
+  Output(caption = "Summarise mit margins")
 ```
 
 
-
-```{r}
-
-Summarise(
-  chol0 + chol1 + chol6 + chol12 ~ g,
-  hyper, key="Zeit",  key.levels = c("Ausgangswert", "1 Monat", "6 Monate", "12 Monate"),
-  fun = function(x)
-    mean(x, na.rm = TRUE) 
  
-) %>%   kable(caption="Summarise mit eigener fun")
 
+```{r, results='asis'}
 
-```
-
-```{r}
-
-Summarise(
+ Summarise(
   chol0 + chol1 + chol6 + chol12 ~ g,
-  hyper, key="Zeit", key.levels = c("Ausgangswert", "1 Monat", "6 Monate", "12 Monate"),
-  .n=function(x) length(na.omit(x)),
-  mean = function(x) mean(x, na.rm = TRUE),
-  sd = function(x)  sd(x, na.rm = TRUE),
-)  %>%   kable(caption="Summarise mit eigener fun")
+  hyper,
+  key = "Zeit",
+  fun = function(x)
+    c(
+      N = length(na.omit(x)),
+      mean =  round(mean(x, na.rm = TRUE), 2),
+      sd =   round(sd(x, na.rm = TRUE), 2)
+    ),
+) %>% Wide( g, c("N",   "mean",    "sd")) %>%   Output(caption = "Summarise mit eigener fun")
 
 
 ```

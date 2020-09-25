@@ -1,6 +1,6 @@
 #' clean_names
 #' 
-#' 
+#' Alternative zu janitor  
 #' Quelle https://drdoane.com/clean-consistent-column-names/
 #'
 #' @param data data.frame oder character
@@ -8,14 +8,14 @@
 #' @param unique eindeitige namen
 #' @param abbreviate,minlength  Abbkürzung
 #'
-#' @return die selbe Klasse wie dr Input
+#' @return die selbe Klasse wie der Input
 #' @export
 #' @examples
 #'
 #'
 #' clean_names(tibble::tibble("Öli"=1:3, "p-k"=1:3, "95%-CI"=4:6) )
 #'
-#' clean_names(
+#' c(
 #'   c(
 #'     "  a", "a  ", "a %", "a",
 #'     "$a", "$$$a", "GDP ($)",
@@ -27,7 +27,8 @@
 #'   ), abbreviate=TRUE
 #' )
 #'
-#' #' Alternative mit janitor#'
+#' 
+#' 
 clean_names <- function(x, ...) {
   UseMethod("clean_names")
 }
@@ -37,6 +38,21 @@ clean_names <- function(x, ...) {
 #' @description \code{clean_names} Input data.frame  output ist ein 
 #' data.frame mit bereinigten namen.
 #' @export
+#' @examples 
+#' 
+#' df <- data.frame(
+#' Öse = c(1, 2, 3, 1, 2, 3),
+#' Löre = gl(2, 3, labels = c("Amy", "Bob")),
+#' Fürn = c(9, 7, 6, 8, 6, 9),
+#' Mäße = c(6, 7, 8, 5, 6, 7),
+#' hüne=c(1, 2, 3, 1, 2, 3)
+#' )
+#' 
+#' 
+#' clean_names(df)
+#' 
+#' 
+#' 
 clean_names.data.frame <-
   function(data,
            label = TRUE,
@@ -44,9 +60,7 @@ clean_names.data.frame <-
            # ues.janitor=FALSE,
            ...) {
     nams_df <- names(data)
-    
     nams_clean <- clean_names.default(nams_df, ...)
-    
     
     if (label) {
       if (is.null(labels)) {
@@ -55,16 +69,14 @@ clean_names.data.frame <-
       else if (length(labels) != length(nams_clean)) {
         stop(" Laenge der labels muss gleich der laenge des DF sein!")
       }
-      
       names(data) <- nams_clean
       names(labels) <- nams_clean
-      stp25aggregate:::label_data_frame(data, labels)
+      label_data_frame(data, labels)
     }
     else {
       names(data) <- nams_clean
       data
     }
-    
   }
 
 
@@ -111,8 +123,7 @@ clean_names.default <-
                                   pattern = replace)
     n <- trimws(n)
     n <- gsub("[^a-zA-Z0-9_]+", "\\.", n)
-    #n <- gsub("([A-Z][a-z])", "_\\1", n)
-    #
+    # n <- gsub("([A-Z][a-z])", "_\\1", n)
     n <- gsub("(^\\.+|\\.+$)", "", n)
     n <- make.names(n)
     
@@ -126,6 +137,9 @@ clean_names.default <-
     
     if (unique)
       n <- make.unique(n, sep = ".")
-    
+
     n
   }
+
+
+

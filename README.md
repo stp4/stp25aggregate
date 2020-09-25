@@ -25,6 +25,17 @@ GetData(): Ladet verschiedene Dateiformate von csv bis sav. Tabellen im
 Text-Format koennen direkt gelesen werden. Zurueckgegeben wird ein
 data.frame.
 
+**xls** Verwendet readxl::read\_excel
+
+**Text direkt** im R-File Es lassen sich direkt Daten als Text einlesen
+dabei kann mit Tabel\_Expand = TRUE, id.vars = 1:2 gesteuert werden ob
+eine Kreuztabelle aufgedroeselt werden soll.
+
+**LimeSurvy** Hier muss eine Liste uebergeben werden die die Filenamen
+beinhaltet also GetData(list(“file.R”,“file.txt”)). Das erste File ist
+das R-File mit den Labels das zweite die Daten. Weitere moegliche
+Parameter sind die Zeichencodierung
+
     setwd("C:/Users/wpete/Dropbox/3_Forschung/R-Project/stp25aggregate")
     
     x <- "fa\xE7ile"
@@ -77,7 +88,7 @@ Tabel_Expand = TRUE, id.vars = 1)
 #> 
 #> 
 #> read-text
-#> Fri Jun 19 15:36:37 2020
+#> Mon Sep 21 09:22:13 2020
 head(dat)
 #>   sex     value
 #> 1   m treatment
@@ -360,9 +371,11 @@ mean3<- function(x)round(mean(x, na.rm=TRUE), 1)
                       fun=mean3,
                       formula = variable ~ student,
                       margins = TRUE)
-#>   variable Amy Bob Total
-#> 1        A 7.3 7.7   7.5
-#> 2        B 7.0 6.0   6.5
+#> # A tibble: 2 x 4
+#>   variable   Amy   Bob Total
+#>   <fct>    <dbl> <dbl> <dbl>
+#> 1 A          7.3   7.7   7.5
+#> 2 B          7     6     6.5
 ```
 
 ### Aufdröseln vom Mehrfachantworten
@@ -498,15 +511,15 @@ calc.mean(
   sd = c(sd(x1), sd(x2))
 )
 #>   value  n        m       sd      var
-#> 1     1  4 1.816368 1.315466 1.730451
-#> 2     2 10 4.411885 1.473129 2.170109
-#> 3 total 14 3.670308 1.839106 3.382313
+#> 1     1  4 2.691633 2.024360 4.098031
+#> 2     2 10 3.485611 1.917675 3.677479
+#> 3 total 14 3.258760 1.905307 3.630196
 mean(c(x1, x2))
-#> [1] 3.670308
+#> [1] 3.25876
 sd(c(x1, x2))
-#> [1] 1.839106
+#> [1] 1.905307
 var(c(x1, x2))
-#> [1] 3.382313
+#> [1] 3.630196
 
 
 calc.mean(
@@ -515,16 +528,16 @@ calc.mean(
   sd = c(sd(x1), sd(x2) , sd(x3))
 )
 #>    value  n        m       sd      var
-#> 1      1  4 1.816368 1.315466 1.730451
-#> 2      2 10 4.411885 1.473129 2.170109
-#> 3      3 11 3.868756 3.073029 9.443506
-#> 31 total 25 3.757625 2.403537 5.776988
+#> 1      1  4 2.691633 2.024360 4.098031
+#> 2      2 10 3.485611 1.917675 3.677479
+#> 3      3 11 2.781148 2.735029 7.480382
+#> 31 total 25 3.048611 2.267539 5.141731
 mean(c(x1, x2, x3))
-#> [1] 3.757625
+#> [1] 3.048611
 sd(c(x1, x2, x3))
-#> [1] 2.403537
+#> [1] 2.267539
 var(c(x1, x2, x3))
-#> [1] 5.776988
+#> [1] 5.141731
 
 
 
