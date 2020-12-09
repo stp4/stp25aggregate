@@ -5,6 +5,7 @@
 \alias{delet_labels}
 \alias{set_label}
 \alias{get_label}
+\alias{wrap_label}
 \alias{GetLabelOrName}
 \alias{label_data_frame}
 \title{Label}
@@ -16,6 +17,8 @@ delet_labels(data)
 set_label(data, labels = NULL)
 
 get_label(data, include.units = FALSE)
+
+wrap_label(x, width = 20, sep = NULL, pattern = "_", replacement = " ")
 
 GetLabelOrName(data, include.units = TRUE)
 
@@ -29,6 +32,14 @@ label_data_frame(data, labels)
 \item{labels}{labels als named vector}
 
 \item{include.units}{Einheiten}
+
+\item{x}{data.frame or string}
+
+\item{width}{laenge 20}
+
+\item{sep}{default newline}
+
+\item{pattern, replacement}{an gsub}
 }
 \description{
 Setzen des attr(data, "label")
@@ -38,6 +49,8 @@ delet_labels:  Loeschen aller Attributs label
 set_label:  Setzen  der Attributs label
 
 get_label und GetLabelOrName:  Abrufen  der Attributs label
+
+wrap_label kuerzt die Labels fur Grafiken.
 
 Intern wenn mit get_label nur die Kopie wiederhergestellt wird.
 }
@@ -65,7 +78,7 @@ get_label(DF)
 DF<- delet_labels(DF)
 get_label(DF)
 
-
-
+DF<- wrap_label(DF)
+get_label(DF)
 
 }
