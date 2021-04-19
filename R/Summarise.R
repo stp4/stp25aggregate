@@ -59,9 +59,11 @@ Summarise <- function(...,
   rslts <- rslts[order(rslts[[1]]), ]
   
   rst<- rslts[ncol(rslts)]
-  if(class(rst[[1]])[1] =="matrix"){
-    nmbr_msr<- colnames(rst[[1]])
+  if (class(rst[[1]])[1] == "matrix") {
+    nmbr_msr <- colnames(rst[[1]])
     rslts <- cbind(rslts[-ncol(rslts)], rst[[1]])
+  } else{
+    names(rslts)[ncol(rslts)] <- value
   }
   
   if (isTRUE(margins)) {
