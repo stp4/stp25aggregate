@@ -24,13 +24,7 @@
 #' df2  %>% Long( Amy_A, Amy_B, Bob_A, Bob_B, by=~month)
 #' 
 #' 
-#' df
-#' Long(list( A=c("Amy_A", "Bob_A"), B=c( "Amy_B", "Bob_B")),
-#'      df2,
-#'      by=~month,
-#'      key = "student",
-#'      key.level=c("Amy", "Bob")
-#' )
+#' 
 #' 
 #' df %>%
 #'   tidyr::gather(variable, value, -(month:student)) %>%
@@ -42,12 +36,16 @@ Long <- function(x, ...) {
 
 #' @rdname Long
 #' @export
+#' 
+#' @examples 
+#' 
+#'   Long( .~ month, df2)
+#'   
 Long.formula <- function(x,
                          data,
                          key = "variable",
                          value = "value",
                          ...) {
-
   x <- stp25formula:::clean_dots_formula(x, names_data = names(data))
   rhs <- all.vars(x[-3])
   lhs <- all.vars(x[-2])
@@ -55,11 +53,12 @@ Long.formula <- function(x,
   data <- data[c(rhs, lhs)]
   lvl <-  get_label(data[rhs])
   
-  rstl  <-
-    tidyr::pivot_longer(data, 
+  rstl <-
+    tidyr::pivot_longer(data,
                         cols = all_of(rhs),
-                        names_to = key, values_to =value)
-  rstl[[key]] <- factor(rstl[[key]] , names(lvl), lvl)
+                        names_to = key,
+                        values_to = value)
+  rstl[[key]] <- factor(rstl[[key]], names(lvl), lvl)
   
   rstl
 }
@@ -100,45 +99,23 @@ Long.data.frame <- function(data,
 }
 
 
-# Long.formula <- function(x, data,  
-#                          key = "variable",
-#                          value = "value", 
-#                          ...) {
-#   is_tbl <- dplyr::is.tbl(data)
-#   molten <- Melt2.formula(x, data, 
-#                           key = key,
-#                           value = value,  
-#                           ...)
-#   if (is_tbl) tibble::as_tibble(molten)
-#   else molten
-# }
-# 
-# 
-# Long.data.frame <- function(data, ..., 
-#                             key = "variable",
-#                             value = "value",
-#                             id.vars = NULL) {
-#   is_tbl <- dplyr::is.tbl(data)
-#   if (is.null(id.vars))
-#     molten <- melt2(data, ..., key = key,
-#                     value = value)
-#   else
-#     molten <- Melt2.data.frame(data, id.vars=id.vars,  
-#                                key = key,
-#                                value = value, 
-#                                ...)
-#   
-#   if (is_tbl) tibble::as_tibble(molten)
-#   else molten
-#   
-# }
-
-
- 
 #' @param key.levels wenn value gesetzt wird dann 1:nlevels
 #'
 #' @rdname Long
 #' @export
+#' 
+#' @examples 
+#' 
+#' Long(list( 
+#'        A=c("Amy_A", "Bob_A"), 
+#'        B=c( "Amy_B", "Bob_B")
+#'        ),
+#'      df2,
+#'      by=~month,
+#'      key = "student",
+#'      key.level=c("Amy", "Bob")
+#' )
+#' 
 Long.list <- function(x,
                       data,
                       by = NULL,
@@ -184,82 +161,3 @@ Long.list <- function(x,
   if (is_tbl) tibble::as_tibble(molten)
   else molten
 }
-
-
- 
-# 
-# Long <- function(x, ...) {
-#   UseMethod("Long")
-# }
-# 
-#  
-# Long.formula <- function(x, data, ...) {
-#   is_tbl <- dplyr::is.tbl(data)
-#   molten <- Melt2.formula(x, data, ...)
-#   if (is_tbl) tibble::as_tibble(molten)
-#   else molten
-# }
-# 
-#  
-# Long.data.frame <- function(data, ..., id.vars = NULL) {
-#   is_tbl <- dplyr::is.tbl(data)
-#   if (is.null(id.vars))
-#     molten <- melt2(data, ...)
-#   else
-#     molten <- Melt2.data.frame(data, id.vars=id.vars, ...)
-# 
-#   if (is_tbl) tibble::as_tibble(molten)
-#   else molten
-# 
-# }
-
-
-
- 
-# Long.list <- function(x,
-#                       data,
-#                       by = NULL,
-#                       key = NULL,
-#                       value = NULL,
-#                       key.levels = NULL,
-#                       ...) {
-#   if (!all(lengths(x)[1] == lengths(x)))
-#     stop("Die liste mus gleich lang sein!")
-#   is_tbl <- dplyr::is.tbl(data)
-#   
-#   first_var <- x[[1]]
-#   if (!is.null(by)) {
-#     if (is_formula2(by))
-#       by <- all.vars(by)
-#     dat <- data[c(by, first_var)]
-#     
-#   } else{
-#     dat <- data[first_var]
-#   }
-#   molten <- melt2(dat, by = by, value = names(x)[1],  ...)
-#   
-#   if (!is.null(key)) {
-#     if (is.null(key.levels))
-#       key.levels <- 1:nlevels(molten$variable)
-#     levels(molten$variable) <-  key.levels
-#     names(molten)[(length(molten) - 1)] <- key
-#   }
-#   
-#   if (length(x) > 1)
-#     for (i in names(x)[-1]) {
-#       next_var <- x[[i]]
-#       dat <- data[next_var]
-#       next_molten <- melt2(dat, value = i,  ...)
-#       if (!is.null(key)) {
-#         next_molten <-  next_molten[-1]
-#       }
-#       
-#       molten <- cbind(molten, next_molten)
-#     }
-#   
-#   
-#   if (is_tbl) tibble::as_tibble(molten)
-#   else molten
-# }
- 
-

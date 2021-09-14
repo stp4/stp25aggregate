@@ -13,8 +13,9 @@
 #' @return reshape objek
 #' @export
 #' @examples
-#' 
-#'  mean3<- function(x) mean(x, round(na.rm=TRUE),2)
+#' #' 
+#' mean3 <- function(x)
+#'   round(mean(x, na.rm = TRUE), 2)
 #' df <- data.frame(
 #'   month = rep(1:3, 2),
 #'   student = rep(c("Amy", "Bob"), each = 3),
@@ -22,20 +23,25 @@
 #'   B = c(6, 7, 8, 5, 6, 7)
 #' )
 #' 
-#' Summarise(A + B ~ student, df )
+#' Summarise(A + B ~ student, df)
 #' 
-#' df %>%  Summarise2(
-#'   A,
-#'   B,
-#'   by =  ~ student+ month,
+#' Summarise(
+#'   df,
+#'   A,  B,
+#'   by =  ~  month,
 #'   fun = mean3,
-#'   formula=student ~ month,
-#'   margins = TRUE 
+#'   formula = month ~ variable,
+#'   margins = TRUE
 #' )
-#' #Recast(chol0+chol1+chol6+chol12~g, hyper, mean, "Zeit", "Cholesterin")  
-#' #Summarise(chol0+chol1+chol6+chol12~g, hyper, fun= mean,  key="Zeit", value="Cholesterin")
 #' 
-#' 
+#' require(stp25data)
+#' Summarise(
+#'   chol0 + chol1 + chol6 + chol12 ~ g,
+#'   hyper,
+#'   fun = mean,
+#'   key = "Zeit",
+#'   value = "Cholesterin"
+#' ) 
 Summarise <- function(...,
                        fun = function(x)
                          length(na.omit(x)),

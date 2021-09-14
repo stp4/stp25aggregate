@@ -173,6 +173,8 @@ clean_names(
 
 
 ```{r}
+ 
+
 df <-   data.frame(
   Source = c("A", "B", "C", "F"),
   x = 1:4,
@@ -180,10 +182,10 @@ df <-   data.frame(
   stringsAsFactors = FALSE
 )
 
-add_row_df(df, c("Erste Zeile" = 1, "Dritte" = 3))
-add_row_df(df, c("Erste Zeile" = 1, "letzte" = 5))
-add_row_df(df, "Erste Zeile")
-add_row_df(df, c("Erste Zeile", "Zweite"))
+stp25tools::add_row_df(df, c("Erste Zeile" = 1, "Dritte" = 3))
+stp25tools::add_row_df(df, c("Erste Zeile" = 1, "letzte" = 5))
+stp25tools::add_row_df(df, "Erste Zeile")
+stp25tools::add_row_df(df, c("Erste Zeile", "Zweite"))
 
 ```
 
@@ -262,7 +264,7 @@ df %>% Wide( student, c(A, B))
 
 
 
-### Berechnen
+### Summarise
 
 ```{r}
 mean3<- function(x)round(mean(x, na.rm=TRUE), 1)
@@ -276,6 +278,44 @@ mean3<- function(x)round(mean(x, na.rm=TRUE), 1)
                       margins = TRUE)
 ```
 
+
+Alternative mosaic
+
+```{r}
+require(mosaic)
+mean(HELPrct$age)
+mean( ~ age, data = HELPrct)
+
+mean3 <- function(x)
+  round(mean(x, na.rm = TRUE), 1)
+#
+# Summarise(daysanysub + dayslink ~ homeless , HELPrct, fun=mean3, key = "group", value = "cbc")
+# Summarise(daysanysub + dayslink ~ homeless , HELPrct, fun=mean3,  margins = TRUE)
+# Summarise(daysanysub + dayslink ~ homeless ,
+#           HELPrct,
+#           fun=mean3,
+#           formula = variable ~ homeless,
+#           margins = TRUE)
+
+
+#namespace:mosaicCore
+Summarise(daysanysub ~ homeless , HELPrct, fun = mean3)
+df_stats(daysanysub ~ homeless , HELPrct, mean3, na.action = na.pass)
+df_stats(daysanysub ~ homeless , HELPrct, mean3)
+
+Summarise(
+  daysanysub + dayslink ~ homeless + sex,
+  HELPrct,
+  fun = function(x)
+    c(m = mean(x, na.rm = TRUE), 
+      sd = sd(x, na.rm = TRUE))
+)
+df_stats(daysanysub + dayslink ~ homeless , HELPrct, mean3, na.action = na.pass)
+df_stats(daysanysub + dayslink ~ homeless , HELPrct, mean3)
+df_stats(daysanysub + dayslink ~ homeless + sex , HELPrct, mean, sd)
+
+
+```
 
 
 ### Aufdröseln vom Mehrfachantworten
@@ -442,13 +482,6 @@ df <- df %>%
 df  
 ```
 
-
-
-
-
-
-
-## Berechnungen mit tidy
 
 
 

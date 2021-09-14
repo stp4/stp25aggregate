@@ -28,3 +28,6 @@ isFALSE <- function(x){identical(FALSE, x )}
 
 is_formula2<- function (x)
   inherits(x, "formula")
+
+
+

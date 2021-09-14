@@ -28,7 +28,9 @@
 #' DF<- delet_labels(DF)
 #' get_label(DF)
 #'
-#'
+#' DF<- wrap_label(DF)
+#' get_label(DF)
+#' 
 Label <- function(data, ...) {
   lbl <- list(...)
   if (length(lbl) == 0) {
@@ -80,9 +82,6 @@ set_label <- function(data, labels = NULL) {
 #' @description get_label und GetLabelOrName:  Abrufen  der Attributs label
 #' @export
 #' 
-#' @examples 
-#' 
-#'
 get_label <- function(data, 
                       include.units = FALSE
                      # , include.names=options()$stp25$include_names
@@ -104,14 +103,21 @@ get_label <- function(data,
 #  }
   
   if (include.units) {
+    
     is_units <- sapply(data, function(z)
-      inherits(z, "units"))
+     # inherits(z, "units")
+      any(names(attributes(z)) %in% "units")
+      )
     if (any(is_units)) {
+      
       lbl_nams <- names(lbl)
       
       lbl_units <-
         sapply(data, function(z)
-          if (inherits(z, "units"))
+          if ( 
+            #inherits(z, "units")
+            any(names(attributes(z)) %in% "units")
+            )
             paste0(" [", as.character(attr(z, "units")), "]")
           else
             "")
@@ -122,6 +128,46 @@ get_label <- function(data,
   lbl
 }
 
+
+#' @rdname Label
+#' @description wrap_label kuerzt die Labels fur Grafiken.
+#' @export
+#' 
+#' @param x data.frame or string
+#' @param width  laenge 20
+#' @param sep default newline 
+#' @param pattern,replacement an gsub
+#' 
+wrap_label <-
+  function(x,
+           width = 20,
+           sep = NULL,
+           pattern = "_",
+           replacement = " ")
+  {
+    if (is.data.frame(x)) {
+      lvl <- .wrap_string(get_label(x), width, sep, pattern, replacement)
+      names(lvl) <- names(x)
+      set_label(x, lvl)
+    }
+    else{
+      .wrap_string(x, width, sep, pattern, replacement)
+    }
+  }
+
+.wrap_string <- function(x, width, sep, pattern, replacement) {
+  x <- trimws(x)
+  x <- gsub("\r?\n|\r", " ", x)
+  if (!is.null(pattern))
+    x <- gsub(pattern, replacement, x)
+  
+  if (is.null(sep))
+    stringr::str_wrap(x, width = width)
+  else
+    gsub("\n", sep, stringr::str_wrap(x, width = width))
+  
+  
+}
 
 #' @rdname Label
 #' @param include.units Einheiten 
